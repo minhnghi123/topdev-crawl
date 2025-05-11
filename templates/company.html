@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Top Công Ty</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/company.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'components/header.html' %}
+    <div class="search-header">
+      <input type="text" placeholder="Nhập Từ Khóa Công Ty" />
+      <select>
+        <option>Địa Điểm</option>
+        <option>Hà Nội</option>
+        <option>Hồ Chí Minh</option>
+      </select>
+      <button>Tìm</button>
+    </div>
+
+    <div class="tabs">
+      <button class="active">Công Ty Hàng Đầu</button>
+      <button>Công Ty Được Theo Dõi Nhiều</button>
+      <button>Công Ty Có Việc Làm Mới Nhất</button>
+      <button>Công Ty Đang Chờ Đón Bạn</button>
+    </div>
+
+    <section class="section">
+      <h2>Công ty hàng đầu</h2>
+      <div class="company-grid">
+        <!-- Một công ty -->
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="VietinBank"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP Công Thương Việt</strong>
+            <p>Hà Nội - Ngân hàng, Tài chính</p>
+            <a href="/company/1">Chi tiết →</a>
+          </div>
+        </div>
+
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="ABBANK"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP An Bình</strong>
+            <p>TP. HCM - Ngân hàng</p>
+            <a href="/company/2">Chi tiết →</a>
+          </div>
+        </div>
+
+        <!-- Thêm các công ty khác -->
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Công ty được theo dỗi nhiều</h2>
+      <div class="company-grid">
+        <!-- Một công ty -->
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="VietinBank"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP Công Thương Việt</strong>
+            <p>Hà Nội - Ngân hàng, Tài chính</p>
+            <a href="/company/1">Chi tiết →</a>
+          </div>
+        </div>
+
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="ABBANK"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP An Bình</strong>
+            <p>TP. HCM - Ngân hàng</p>
+            <a href="/company/2">Chi tiết →</a>
+          </div>
+        </div>
+
+        <!-- Thêm các công ty khác -->
+      </div>
+    </section>
+    <section class="section">
+      <h2>Công ty có việc làm mới nhất</h2>
+      <div class="company-grid">
+        <!-- Một công ty -->
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="VietinBank"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP Công Thương Việt</strong>
+            <p>Hà Nội - Ngân hàng, Tài chính</p>
+            <a href="/company/1">Chi tiết →</a>
+          </div>
+        </div>
+
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="ABBANK"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP An Bình</strong>
+            <p>TP. HCM - Ngân hàng</p>
+            <a href="/company/2">Chi tiết →</a>
+          </div>
+        </div>
+
+        <!-- Thêm các công ty khác -->
+      </div>
+    </section>
+    <section class="section">
+      <h2>Công ty đang chờ đón bạn</h2>
+      <div class="company-grid">
+        <!-- Một công ty -->
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="VietinBank"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP Công Thương Việt</strong>
+            <p>Hà Nội - Ngân hàng, Tài chính</p>
+            <a href="/company/1">Chi tiết →</a>
+          </div>
+        </div>
+
+        <div class="company-card">
+          <img
+            src="https://salt.topdev.vn/A_0YQODzbFNFDHCfgsPraXn5T0_-6gxCdVl3JP5gXiY/auto/310/250/ce/1/aHR0cHM6Ly9hc3NldHMudG9wZGV2LnZuL2ltYWdlcy8yMDIzLzA0LzA3L1RvcERldi1vcHRpbWl6ZS0tLVJ1VG9IYS1mYW1pbHktMTY4MDgzODcwMC5qcGc/topdev-optimize-rutoha-family-1680838700.jpg"
+            alt="ABBANK"
+          />
+          <div class="info">
+            <strong>Ngân hàng TMCP An Bình</strong>
+            <p>TP. HCM - Ngân hàng</p>
+            <a href="/company/2">Chi tiết →</a>
+          </div>
+        </div>
+
+        <!-- Thêm các công ty khác -->
+      </div>
+    </section>
+
+    <script src="../static/js/company.js"></script>
+  </body>
+</html>
