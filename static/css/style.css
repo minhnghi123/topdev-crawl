@@ -1,5 +1,272 @@
 body {
-  font-family: Arial, sans-serif;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fef7f4;
+}
+
+.topdev-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 35px 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #e14c2a;
+}
+
+.logo span {
+  color: #555;
+}
+
+.topdev-header nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.topdev-header .badge {
+  background-color: #ff5b4d;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.right-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #444;
+}
+
+.right-menu .icon {
+  font-size: 28px;
+}
+
+.right-menu .lang {
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  color: #e14c2a;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.dropdown-toggle::after {
+  content: "▾";
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Sát bên dưới toggle */
+  left: 0;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: none;
+  min-width: 220px;
+  z-index: 1000;
+  border-radius: 4px;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-menu a:hover {
   background-color: #f0f0f0;
+}
+
+.dropdown-menu .dropdown-item {
+  position: relative;
+  padding: 10px 20px;
+  white-space: nowrap;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background: #f9f9f9;
+}
+
+.dropdown-item:hover > .submenu {
+  display: block;
+}
+
+.has-submenu .submenu {
+  display: none;
+  position: absolute;
+  padding: 20px;
+  column-count: 3;
+  column-gap: 40px;
+  top: 0;
+  left: 100%; /* show bên phải */
+  background: white;
+  min-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.submenu a {
+  display: block;
+  padding: 5px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.has-submenu:hover .submenu {
+  display: block;
+}
+
+.multi-column {
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 600px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.multi-column .column {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.multi-column a {
+  padding: 5px 0;
+  text-decoration: none;
+  color: #333;
+}
+
+
+.search-section {
+  background: #ffe9dc;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-container {
+  width: 100%;
+  max-width: 900px;
   text-align: center;
-} 
+}
+
+.main-title {
+  font-size: 28px;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+.highlight {
+  background-color: #e14c2a;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-form input[type="text"] {
+  width: 60%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px 0 0 6px;
+  outline: none;
+}
+
+.search-form button {
+  padding: 12px 25px;
+  font-size: 16px;
+  background-color: #e14c2a;
+  color: white;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background-color: #c43f1d;
+}
+
+.suggestions {
+  text-align: left;
+  max-width: 900px;
+  margin: auto;
+}
+
+.suggestion-label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.suggestion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-buttons a {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.suggestion-buttons a:hover {
+  background: #f0f0f0;
+}
+
+.nav-buttons {
+  margin: 40px auto;
+  text-align: center;
+}
+
+.nav-buttons button {
+  margin: 10px;
+  padding: 12px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nav-buttons button:hover {
+  background-color: #0056b3;
+}

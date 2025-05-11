@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tìm kiếm công việc</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/search.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Tìm kiếm, lọc và sắp xếp công việc</h1>
+
+    <!-- Form tìm kiếm -->
+    <form method="GET" action="/search">
+      <input type="text" name="query" placeholder="Nhập từ khóa..." />
+      
+      <label for="location">Địa điểm:</label>
+      <select name="location" id="location">
+        <option value="">-- Tất cả --</option>
+        <option value="Hà Nội">Hà Nội</option>
+        <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+        <option value="Đà Nẵng">Đà Nẵng</option>
+      </select>
+
+      <label for="salary">Mức lương:</label>
+      <select name="salary" id="salary">
+        <option value="">-- Tất cả --</option>
+        <option value="low">Dưới 10 triệu</option>
+        <option value="medium">10-20 triệu</option>
+        <option value="high">Trên 20 triệu</option>
+      </select>
+
+      <label for="sort">Sắp xếp theo:</label>
+      <select name="sort" id="sort">
+        <option value="">-- Không sắp xếp --</option>
+        <option value="date">Ngày đăng</option>
+        <option value="salary">Mức lương</option>
+        <option value="title">Tiêu đề</option>
+      </select>
+
+      <button type="submit">Tìm kiếm</button>
+    </form>
+
+    <!-- Kết quả -->
+    <h2>Kết quả tìm kiếm</h2>
+    {% if jobs %}
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Tiêu đề</th>
+          <th>Công ty</th>
+          <th>Địa điểm</th>
+          <th>Mức lương</th>
+          <th>Ngày đăng</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.company_name }}</td>
+          <td>{{ job.location }}</td>
+          <td>{{ job.salary }}</td>
+          <td>{{ job.date_posted }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Không tìm thấy công việc phù hợp.</p>
+    {% endif %}
+  </body>
+</html>
