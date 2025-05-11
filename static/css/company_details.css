@@ -1,0 +1,142 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f6f6f6;
+}
+
+.company-banner {
+  background: white;
+  border-bottom: 1px solid #ccc;
+}
+
+.company-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.company-header .logo {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+.company-header .info {
+  flex-grow: 1;
+}
+
+.job-count {
+  color: #ee4d2d;
+  font-weight: bold;
+}
+
+.follow-btn {
+  background: #ee4d2d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  padding: 20px 50px;
+  gap: 30px;
+}
+
+.main-content {
+  flex: 3;
+}
+
+.sidebar {
+  flex: 1;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tabs .active {
+  border-bottom: 3px solid #ee4d2d;
+  color: #ee4d2d;
+}
+
+section {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+.image-row {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.image-row img {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+.products {
+  display: flex;
+  gap: 20px;
+}
+
+.product-box {
+  background: #f3f3f3;
+  padding: 15px;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.job-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.job-card h4 {
+  margin: 0;
+}
+
+.tags span {
+  display: inline-block;
+  background: #e6f0ff;
+  color: #0056b3;
+  padding: 5px 10px;
+  margin: 3px 5px 0 0;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.sidebar .box {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+.sidebar a {
+  color: #007bff;
+  text-decoration: none;
+}
