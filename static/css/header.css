@@ -96,3 +96,116 @@
   color: #666;
   margin-left: 8px;
 }
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown toggle button */
+.dropdown-toggle {
+  color: #e14c2a;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.dropdown-toggle::after {
+  content: "▾";
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Sát bên dưới toggle */
+  left: 0;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: none;
+  min-width: 220px;
+  z-index: 1000;
+  border-radius: 4px;
+}
+
+/* Dropdown menu items */
+.dropdown-menu a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+/* Dropdown item container */
+.dropdown-menu .dropdown-item {
+  position: relative;
+  padding: 10px 20px;
+  white-space: nowrap;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background: #f9f9f9;
+}
+
+/* Submenu inside dropdown */
+.dropdown-item:hover > .submenu {
+  display: block;
+}
+
+.has-submenu .submenu {
+  display: none;
+  position: absolute;
+  padding: 20px;
+  column-count: 3;
+  column-gap: 40px;
+  top: 0;
+  left: 100%; /* Hiển thị submenu bên phải */
+  background: white;
+  min-width: 500px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Submenu links */
+.submenu a {
+  display: block;
+  padding: 5px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.has-submenu:hover .submenu {
+  display: block;
+}
+
+/* Multi-column submenu */
+.multi-column {
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 600px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.multi-column .column {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.multi-column a {
+  padding: 5px 0;
+  text-decoration: none;
+  color: #333;
+}

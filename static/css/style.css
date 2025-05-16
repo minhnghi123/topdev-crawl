@@ -17,6 +17,7 @@ body {
 }
 
 .logo {
+  cursor: pointer;
   font-size: 24px;
   font-weight: bold;
   color: #e14c2a;
@@ -24,6 +25,11 @@ body {
 
 .logo span {
   color: #555;
+}
+
+.logo1{
+  position: absolute;
+  left: 10%;
 }
 
 .topdev-header nav a {

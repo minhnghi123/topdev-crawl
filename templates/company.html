@@ -9,6 +9,11 @@
       type="text/css"
       href="{{ url_for('static', filename='css/company.css') }}"
     />
+    <link 
+      rel="stylesheet" 
+      type="text/css" 
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
   </head>
   <body>
     {% include 'components/header.html' %}
@@ -156,5 +161,7 @@
     </section>
 
     <script src="../static/js/company.js"></script>
+    <script src="../static/js/dropdownHeader.js"></script>
+
   </body>
 </html>
