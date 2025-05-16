@@ -58,11 +58,6 @@ body {
   color: white;
 }
 
-.tabs button.active {
-  background-color: #ee4d2d;
-  color: white;
-}
-
 .section {
   padding: 30px 50px;
 }
@@ -75,54 +70,107 @@ body {
   align-items: center;
 }
 
-.highlight-link {
-  font-size: 0.9em;
-  color: #ee4d2d;
-  cursor: pointer;
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 24px 0 8px 0;
+  padding-left: 40px;
 }
 
 .company-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 40px;
 }
 
 .company-card {
-  background: white;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  min-height: 330px;
+  transition: none;
+  box-shadow: none;
 }
 
-.company-card:hover {
-  transform: translateY(-5px);
-}
-
-.company-card img {
-  width: 100%;
+.company-background {
   height: 140px;
-  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
-.company-card .info {
-  padding: 10px 15px;
+.company-logo {
+  width: 56px;
+  height: 56px;
+  background: white;
+  border-radius: 4px;
+  object-fit: contain;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  bottom: -28px;
+  left: 12px;
+  border: 1px solid #eee;
 }
 
-.company-card .info strong {
-  display: block;
-  font-size: 1em;
-  margin-bottom: 5px;
+.company-content {
+  padding: 40px 12px 12px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.company-card .info p {
+.company-content h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slogan {
+  font-size: 13px;
   color: #666;
-  font-size: 0.9em;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.company-card .info a {
-  color: #ee4d2d;
-  font-size: 0.9em;
+.location,
+.industry {
+  color: #888;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.job-follow-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.job-link {
+  color: #e14c2a;
+  font-weight: 500;
   text-decoration: none;
+}
+
+.job-link::after {
+  content: " →";
+}
+
+.no-job {
+  color: #aaa;
 }
