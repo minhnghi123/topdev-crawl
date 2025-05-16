@@ -61,7 +61,9 @@
                 >{{ company.jobs_count }} Job →</a
               >
               {% else %}
-              <span class="no-job">0 Job</span>
+              <a class="job-link" href="{{ company.link }}" target="_blank"
+                >Xem chi tiết</a
+              >
               {% endif %}
             </div>
           </div>

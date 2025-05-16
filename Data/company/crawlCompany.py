@@ -37,7 +37,7 @@ def load_full_page():
     time.sleep(3)
 
     click_count = 0
-    max_clicks = 10  # Chỉ để phòng trường hợp infinite loop, bạn có thể tăng nếu muốn crawl nhiều hơn
+    max_clicks = 100  # Chỉ để phòng trường hợp infinite loop, bạn có thể tăng nếu muốn crawl nhiều hơn
 
     while click_count < max_clicks:
         try:
@@ -75,68 +75,86 @@ def load_full_page():
 def crawl_companies():
     html = load_full_page()
     soup = BeautifulSoup(html, 'html.parser')
-    companies = []
-    seen_links = set()
-    seen_names = set()
 
-    for frame in soup.select('.frame.style-2'):
-        name_tag = frame.select_one('h6.font-size20')
-        link_tag = frame.select_one('a.link')
-        logo_img_tag = frame.select_one('p.small-img img')
-        bg_img_tag = frame.select_one('p.big-img img')
-        desc_tag = frame.select_one('p.fz13.ml20.mb-1')
-        location_tag = frame.select_one('p.fz13.c--grey.ml20.mb-2')
-        industry_tag = frame.select('div.wrap-between p.fz13.c--grey.ml20')
-        followers_tag = frame.select_one('span.total-followed')
-        jobs_tag = frame.select_one('a.c--primary')
+    section_mappings = {
+        "section_company_highlight": "Công ty hàng đầu",
+        "section_company_followers": "Công ty được theo dõi nhiều",
+        "section_company_news_jobs": "Công ty có việc làm mới nhất",
+        "section_contents": "Công Ty đang chờ đón bạn",
+    }
 
-        name = name_tag.get_text(strip=True) if name_tag else "Unknown"
-        raw_link = link_tag['href'].strip() if link_tag and link_tag.has_attr('href') else ""
+    all_sections_data = {}
 
-        # Chuẩn hóa name và link
-        normalized_name = name.lower().strip()
-        link = raw_link.strip()
-        if link.startswith("/"):
-            link = "https://topdev.vn" + link
-        link = link.lower().strip().replace(" ", "")
-
-        # Bỏ qua nếu bị trùng tên hoặc trùng link
-        if link in seen_links or normalized_name in seen_names:
+    for section_id, section_name in section_mappings.items():
+        section = soup.find("section", id=section_id)
+        if not section:
+            print(f"⚠️ Không tìm thấy section: {section_id}")
             continue
 
-        seen_links.add(link)
-        seen_names.add(normalized_name)
+        companies = []
+        seen_links = set()
+        seen_names = set()
 
-        logo = logo_img_tag.get('data-src', '').strip() or logo_img_tag.get('src', '').strip()
-        background_image = bg_img_tag.get('data-src', '').strip() or bg_img_tag.get('src', '').strip()
-        description = desc_tag.get_text(strip=True) if desc_tag else "N/A"
-        location = location_tag.get_text(strip=True) if location_tag else "N/A"
-        industry = industry_tag[-1].get_text(strip=True) if industry_tag else "N/A"
-        followers = followers_tag.get_text(strip=True) if followers_tag and followers_tag.text.strip() else "0"
+        for frame in section.select('.frame.style-2'):
+            name_tag = frame.select_one('h6.font-size20')
+            link_tag = frame.select_one('a.link')
+            logo_img_tag = frame.select_one('p.small-img img')
+            bg_img_tag = frame.select_one('p.big-img img')
+            desc_tag = frame.select_one('p.fz13.ml20.mb-1')
+            location_tag = frame.select_one('p.fz13.c--grey.ml20.mb-2')
+            industry_tag = frame.select('div.wrap-between p.fz13.c--grey.ml20')
+            followers_tag = frame.select_one('span.total-followed')
+            jobs_tag = frame.select_one('a.c--primary')
 
-        jobs_count = "0"
-        if jobs_tag:
-            jobs_text = jobs_tag.get_text(strip=True)
-            match = re.search(r'(\d+)\s*Jobs?', jobs_text, re.IGNORECASE)
-            if match:
-                jobs_count = match.group(1)
+            name = name_tag.get_text(strip=True) if name_tag else "Unknown"
+            raw_link = link_tag['href'].strip() if link_tag and link_tag.has_attr('href') else ""
 
-        companies.append({
-            "name": name,
-            "link": link,
-            "logo": logo,
-            "background_image": background_image,
-            "description": description,
-            "location": location,
-            "industry": industry,
-            "followers": followers,
-            "jobs_count": jobs_count
-        })
+            normalized_name = name.lower().strip()
+            link = raw_link.strip()
+            if link.startswith("/"):
+                link = "https://topdev.vn" + link
+            link = link.lower().strip().replace(" ", "")
+
+            if link in seen_links or normalized_name in seen_names:
+                continue
+
+            seen_links.add(link)
+            seen_names.add(normalized_name)
+
+            logo = logo_img_tag.get('data-src', '').strip() or logo_img_tag.get('src', '').strip()
+            background_image = bg_img_tag.get('data-src', '').strip() or bg_img_tag.get('src', '').strip()
+            description = desc_tag.get_text(strip=True) if desc_tag else "N/A"
+            location = location_tag.get_text(strip=True) if location_tag else "N/A"
+            industry = industry_tag[-1].get_text(strip=True) if industry_tag else "N/A"
+            followers = followers_tag.get_text(strip=True) if followers_tag and followers_tag.text.strip() else "0"
+
+            jobs_count = "0"
+            if jobs_tag:
+                jobs_text = jobs_tag.get_text(strip=True)
+                match = re.search(r'(\d+)\s*Jobs?', jobs_text, re.IGNORECASE)
+                if match:
+                    jobs_count = match.group(1)
+
+            companies.append({
+                "name": name,
+                "link": link,
+                "logo": logo,
+                "background_image": background_image,
+                "description": description,
+                "location": location,
+                "industry": industry,
+                "followers": followers,
+                "jobs_count": jobs_count,
+                "section": section_id
+            })
+
+        all_sections_data[section_name] = companies
+        print(f"Đã crawl {len(companies)} công ty từ section '{section_name}'")
 
     with open('companyData.json', 'w', encoding='utf-8') as f:
-        json.dump(companies, f, ensure_ascii=False, indent=4)
+        json.dump(all_sections_data, f, ensure_ascii=False, indent=4)
 
-    print(f"✅ Đã lưu {len(companies)} công ty vào companyData.json")
+    print("🎉 Đã lưu dữ liệu phân loại theo section vào companyData.json")
 
 if __name__ == "__main__":
     crawl_companies()
