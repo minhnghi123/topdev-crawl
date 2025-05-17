@@ -1,47 +1,71 @@
+:root {
+  --primary-color: #e64523;
+  --light-gray: #f5f6fa;
+  --text-color: #333;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  background: #f6f6f6;
+  background-color: var(--light-gray);
+  color: var(--text-color);
 }
 
-.company-banner {
-  background: white;
-  border-bottom: 1px solid #ccc;
+.company-banner img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 1;
+  object-fit: cover;
+  background-color: #f0f0f0;
 }
 
 .company-header {
   display: flex;
   align-items: center;
+  gap: 20px;
   padding: 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .company-header .logo {
   width: 80px;
   height: 80px;
-  margin-right: 20px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: white;
+  border: 1px solid #eee;
+  padding: 5px;
 }
 
-.company-header .info {
-  flex-grow: 1;
+.company-header .info h2 {
+  margin: 0;
+  font-size: 24px;
 }
 
-.job-count {
-  color: #ee4d2d;
-  font-weight: bold;
+.follow-btn,
+.share-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .follow-btn {
-  background: #ee4d2d;
+  background-color: var(--primary-color);
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+}
+
+.share-btn {
+  background-color: white;
+  border: 1px solid #ccc;
+  margin-left: 10px;
 }
 
 .container {
   display: flex;
-  padding: 20px 50px;
+  max-width: 1200px;
+  margin: 30px auto;
   gap: 30px;
 }
 
@@ -49,50 +73,47 @@ body {
   flex: 3;
 }
 
-.sidebar {
-  flex: 1;
-}
-
 .tabs {
   display: flex;
-  margin-bottom: 20px;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .tabs button {
-  background: none;
-  border: none;
   padding: 10px 20px;
+  border: 1px solid #ddd;
+  background: white;
   cursor: pointer;
-  font-weight: bold;
 }
 
-.tabs .active {
-  border-bottom: 3px solid #ee4d2d;
-  color: #ee4d2d;
+.tabs button.active {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 section {
   background: white;
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 6px;
+  border-radius: 8px;
+}
+
+section h3 {
+  margin-top: 0;
+  color: var(--primary-color);
 }
 
 .image-row {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   margin-top: 10px;
 }
 
 .image-row img {
-  width: 300px;
-  height: 200px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
-}
-
-ul {
-  padding-left: 20px;
+  border-radius: 6px;
 }
 
 .products {
@@ -101,42 +122,47 @@ ul {
 }
 
 .product-box {
-  background: #f3f3f3;
+  background: #fafafa;
   padding: 15px;
   border-radius: 6px;
   flex: 1;
+  border: 1px solid #eee;
 }
 
 .job-card {
-  border: 1px solid #ddd;
+  background: #fafafa;
   padding: 15px;
-  margin-bottom: 10px;
-  background: #fff;
   border-radius: 6px;
+  margin-bottom: 10px;
+  border: 1px solid #eee;
 }
 
-.job-card h4 {
-  margin: 0;
+.tags {
+  margin-top: 10px;
 }
 
 .tags span {
   display: inline-block;
-  background: #e6f0ff;
-  color: #0056b3;
-  padding: 5px 10px;
-  margin: 3px 5px 0 0;
-  border-radius: 4px;
-  font-size: 12px;
+  background-color: #ffe9e4;
+  color: var(--primary-color);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-right: 6px;
+  margin-top: 6px;
 }
 
-.sidebar .box {
+.sidebar {
+  flex: 1;
+}
+
+.box {
   background: white;
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-.sidebar a {
-  color: #007bff;
-  text-decoration: none;
+.box h4 {
+  margin-top: 0;
 }

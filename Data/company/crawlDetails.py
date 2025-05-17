@@ -1,93 +1,124 @@
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import json
 import time
+import random
+def setup_driver():
+    options = Options()
+    options.add_argument("--headless")  # Chạy ẩn
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(options=options)
+    return driver
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-}
-
-def get_company_detail(url):
+def get_text_or_default(driver, by, selector, default=""):
     try:
-        res = requests.get(url, headers=HEADERS)
-        if res.status_code != 200:
-            print(f"Không thể truy cập {url}")
-            return None
+        return driver.find_element(by, selector).text.strip()
+    except NoSuchElementException:
+        return default
 
-        soup = BeautifulSoup(res.text, 'html.parser')
+def get_company_detail(driver, url):
+    try:
+        driver.get(url)
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1")))
 
-        company_name = soup.select_one("h1").get_text(strip=True) if soup.select_one("h1") else "Unknown"
+        soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        slogan = soup.select_one("#common-information p")
-        slogan = slogan.get_text(strip=True) if slogan else ""
+        company_name = get_text_or_default(driver, By.TAG_NAME, "h1", "Unknown")
 
-        # --- Giới thiệu về công ty ---
+        # Slogan
+        slogan_tag = soup.select_one("#common-information p")
+        slogan = slogan_tag.get_text(strip=True) if slogan_tag else ""
+
+        # Giới thiệu công ty
         about_section = soup.select_one("#company-profile .prose")
         about_text = about_section.get_text("\n", strip=True) if about_section else ""
         about_html = str(about_section) if about_section else ""
-        about_images = []
 
-        if about_section:
-            about_images = [img["src"].strip() for img in about_section.find_all("img") if img.has_attr("src")]
-
-        # --- Website công ty ---
-        # Cố gắng tìm đúng website chính thức của công ty
-        website = ""
+        # Website
         website_tag = soup.select_one("div.mt-4 a[href^='http']")
-        if website_tag:
-            website = website_tag["href"].strip()
+        website = website_tag["href"].strip() if website_tag else ""
 
-        # --- Địa chỉ ---
+        # Địa chỉ
         address_tag = soup.select_one("div.mt-4 p.flex-1")
         address = address_tag.get_text(strip=True) if address_tag else ""
 
-        # --- Kỹ năng công nghệ ---
+        # Kỹ năng công nghệ
         skills = [tag.get_text(strip=True) for tag in soup.select("div.mt-4 ul li span")]
 
-        # --- Lĩnh vực ---
-        field = soup.find("h3", string="Lĩnh vực")
-        field_text = field.find_next("p").get_text(strip=True) if field else ""
+        # Lĩnh vực
+        field_header = soup.find("h3", string="Lĩnh vực")
+        field_text = field_header.find_next("p").get_text(strip=True) if field_header else ""
 
-        # --- Quy mô ---
-        size = soup.find("h3", string="Quy mô công ty")
-        size_text = size.find_next("p").get_text(strip=True) if size else ""
+        # Quy mô công ty
+        size_header = soup.find("h3", string="Quy mô công ty")
+        size_text = size_header.find_next("p").get_text(strip=True) if size_header else ""
 
-                # --- Vị trí tuyển dụng ---
+        # Vị trí tuyển dụng
         jobs = []
         job_section = soup.select_one("section#opening-jobs")
         if job_section:
-            job_items = job_section.select("ul > li")
-            for item in job_items:
+            for item in job_section.select("ul > li"):
                 title_tag = item.select_one("h3 a")
                 title = title_tag.get_text(strip=True) if title_tag else ""
                 job_url = "https://topdev.vn" + title_tag["href"] if title_tag and title_tag.has_attr("href") else ""
 
-                # Công ty
                 company_tag = item.select_one("div.line-clamp-1 a.text-gray-400")
-                company_name = company_tag.get_text(strip=True) if company_tag else ""
+                job_company = company_tag.get_text(strip=True) if company_tag else ""
 
-                # Địa điểm và hình thức làm việc
                 location_tag = item.select_one("div.text-gray-400")
                 location = location_tag.get_text(strip=True) if location_tag else ""
 
-                # Kỹ năng
                 skill_tags = item.select("div.line-clamp-1 span a span")
-                skills = [tag.get_text(strip=True) for tag in skill_tags]
+                job_skills = [tag.get_text(strip=True) for tag in skill_tags]
 
-                # Thời gian đăng
-                posted_time = item.select_one("p.text-sm.text-gray-400")
-                posted = posted_time.get_text(strip=True) if posted_time else ""
+                posted_tag = item.select_one("p.text-sm.text-gray-400")
+                posted = posted_tag.get_text(strip=True) if posted_tag else ""
 
                 jobs.append({
                     "title": title,
                     "url": job_url,
-                    "company": company_name,
+                    "company": job_company,
                     "location": location,
-                    "skills": skills,
+                    "skills": job_skills,
                     "posted": posted
                 })
 
-        # Thêm vào dict kết quả
+        # ✅ Lấy danh sách sản phẩm (từ #product section)
+        products = []
+        product_section = soup.select("section#product .swiper-slide")
+        for item in product_section:
+            name_tag = item.select_one("a.font-bold")
+            name = name_tag.get_text(strip=True) if name_tag else ""
+            link = name_tag["href"].strip() if name_tag and name_tag.has_attr("href") else ""
+
+            desc_tag = item.select_one(".prose")
+            description = desc_tag.get_text(strip=True) if desc_tag else ""
+
+            img_tag = item.select_one("img")
+            image = img_tag["src"].strip() if img_tag and img_tag.has_attr("src") else ""
+
+            products.append({
+                "name": name,
+                "description": description,
+                "link": link,
+                "image": image
+            })
+
+        # ✅ Lọc ảnh trong phần giới thiệu (loại ảnh trùng với product image)
+        product_images_set = set(p["image"].strip() for p in products if p.get("image"))
+        about_images = []
+        for img in soup.select(".swiper-slide img"):
+            src = img.get("src")
+            if src:
+                if src.strip() not in product_images_set:
+                    about_images.append(src.strip())
+
         return {
             "name": company_name,
             "slogan": slogan,
@@ -100,32 +131,34 @@ def get_company_detail(url):
             "field": field_text,
             "company_size": size_text,
             "url": url,
-            "jobs": jobs
+            "jobs": jobs,
+            "products": products
         }
-
 
     except Exception as e:
         print(f"Lỗi khi crawl {url}: {e}")
-        return None ,
+        return None
+
 def crawl_company_details():
     with open("companyData.json", "r", encoding="utf-8") as f:
         companies = json.load(f)
 
+    driver = setup_driver()
     detailed_companies = []
 
     for idx, company in enumerate(companies, 1):
         print(f"({idx}/{len(companies)}) Đang crawl: {company['name']} - {company['link']}")
-        detail = get_company_detail(company['link'])
+        detail = get_company_detail(driver, company['link'])
         if detail:
             detailed_companies.append(detail)
-        time.sleep(1.5)  # tránh bị block
+        time.sleep(random.uniform(0.5, 1.2))
 
-    # Lưu vào file JSON
+    driver.quit()
+
     with open("companyDetails.json", "w", encoding="utf-8") as f:
         json.dump(detailed_companies, f, ensure_ascii=False, indent=4)
 
-    print(f"\n Dã lưu {len(detailed_companies)} công ty chi tiết vào companyDetails.json")
-
+    print(f"\nĐã lưu {len(detailed_companies)} công ty chi tiết vào companyDetails.json")
 
 if __name__ == "__main__":
     crawl_company_details()

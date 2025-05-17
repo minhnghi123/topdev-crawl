@@ -57,11 +57,17 @@
             <div class="job-follow-row">
               <span>{{ company.followers }} 👥</span>
               {% if company.jobs_count != "0" %}
-              <a class="job-link" href="{{ company.link }}" target="_blank"
+              <a
+                class="job-link"
+                href="/company/{{loop.index-1}}"
+                target="_blank"
                 >{{ company.jobs_count }} Job →</a
               >
               {% else %}
-              <a class="job-link" href="{{ company.link }}" target="_blank"
+              <a
+                class="job-link"
+                href="/company/{{loop.index-1}}"
+                target="_blank"
                 >Xem chi tiết</a
               >
               {% endif %}
