@@ -59,6 +59,46 @@ def get_company_detail(driver, url):
         size_header = soup.find("h3", string="Quy mô công ty")
         size_text = size_header.find_next("p").get_text(strip=True) if size_header else ""
 
+        # Quốc tịch công ty
+        nationality = ""
+        nationality_flag = ""
+        nation_header = soup.find("h3", string="Quốc tịch công ty")
+        if nation_header:
+            nation_item = nation_header.find_next("ul").select_one("li div")
+            if nation_item:
+                flag_img = nation_item.select_one("img")
+                flag_text = nation_item.select_one("p")
+                nationality = flag_text.get_text(strip=True) if flag_text else ""
+                nationality_flag = flag_img["src"].strip() if flag_img and flag_img.has_attr("src") else ""
+
+        # Mạng xã hội
+        social_links = []
+        social_header = soup.find("h3", string="Mạng xã hội")
+        if social_header:
+            for a_tag in social_header.find_next("ul").select("a[href]"):
+                link = a_tag["href"]
+                platform = ""
+                icon = a_tag.select_one("i")
+                if icon and icon.has_attr("class"):
+                    classes = icon["class"]
+                    for cls in classes:
+                        if "facebook" in cls:
+                            platform = "Facebook"
+                        elif "linkedin" in cls:
+                            platform = "LinkedIn"
+                        elif "twitter" in cls:
+                            platform = "Twitter"
+                        elif "youtube" in cls:
+                            platform = "YouTube"
+                        elif "github" in cls:
+                            platform = "GitHub"
+                        elif "globe" in cls:
+                            platform = "Website"
+                social_links.append({
+                    "platform": platform or "Other",
+                    "url": link
+                })
+
         # Vị trí tuyển dụng
         jobs = []
         job_section = soup.select_one("section#opening-jobs")
@@ -89,7 +129,7 @@ def get_company_detail(driver, url):
                     "posted": posted
                 })
 
-        # ✅ Lấy danh sách sản phẩm (từ #product section)
+        # Sản phẩm
         products = []
         product_section = soup.select("section#product .swiper-slide")
         for item in product_section:
@@ -110,26 +150,29 @@ def get_company_detail(driver, url):
                 "image": image
             })
 
-        # ✅ Lọc ảnh trong phần giới thiệu (loại ảnh trùng với product image)
+        # Lọc ảnh trong phần giới thiệu (loại ảnh trùng với product image)
         product_images_set = set(p["image"].strip() for p in products if p.get("image"))
         about_images = []
         for img in soup.select(".swiper-slide img"):
             src = img.get("src")
-            if src:
-                if src.strip() not in product_images_set:
-                    about_images.append(src.strip())
+            if src and src.strip() not in product_images_set:
+                about_images.append(src.strip())
 
         return {
             "name": company_name,
             "slogan": slogan,
             "about_text": about_text,
-            "about_html": about_html,
             "about_images": about_images,
             "website": website,
             "address": address,
             "skills": skills,
             "field": field_text,
             "company_size": size_text,
+            "nationality": {
+                "name": nationality,
+                "flag": nationality_flag
+            },
+            "social_links": social_links,
             "url": url,
             "jobs": jobs,
             "products": products
@@ -150,6 +193,13 @@ def crawl_company_details():
         print(f"({idx}/{len(companies)}) Đang crawl: {company['name']} - {company['link']}")
         detail = get_company_detail(driver, company['link'])
         if detail:
+            detail["logo"] =company.get("logo", "") ;
+            detail["banner"]=company.get("background_image", "") ;
+            detail["short_address"]= company.get("location","") ; 
+            detail["industry"]= company.get("industry","") ;
+            detail["followers"] = company.get("followers", 0) ; 
+            detail["jobs_count"] =  company.get("jobs_count", 0) ;
+            detail["section"] = company.get("section", "") ;
             detailed_companies.append(detail)
         time.sleep(random.uniform(0.5, 1.2))
 
