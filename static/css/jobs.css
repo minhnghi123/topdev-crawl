@@ -1,0 +1,165 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.img-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+.main-content {
+    display: flex;
+    margin: 0 auto;
+    padding: 24px;
+    align-items: flex-start;
+}
+
+.filter-sidebar {
+    width: 260px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 20px;
+    margin-right: 24px;
+    height: fit-content;
+}
+
+.filter-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.15rem;
+    color: #b71c1c;
+    text-align: center;
+}
+
+.filter-sidebar label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 10px;
+    color: #333;
+}
+
+.filter-sidebar input[type="text"],
+.filter-sidebar select {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+.filter-sidebar button[type="submit"] {
+    background: #b71c1c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.filter-sidebar button[type="submit"]:hover {
+    background: #d32f2f;
+}
+
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.job-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 20px;
+    transition: box-shadow 0.2s;
+    border: 1px solid #f5bdbd;
+    min-height: 320px;
+
+}
+
+.job-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+
+.job-logo-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.job-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.job-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #b71c1c;
+}
+
+.job-company {
+    color: #333;
+    margin-top: 2px;
+}
+
+.job-info {
+    color: #e65100;
+    font-size: 0.97rem;
+    margin-bottom: 6px;
+}
+
+.job-location {
+    color: #607d8b;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+.job-desc {
+    color: #444;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.job-skills {
+    margin-top: 8px;
+}
+
+.job-skill {
+    display: inline-block;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-right: 4px;
+    font-size: 0.93rem;
+    margin-bottom: 2px;
+}
