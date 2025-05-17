@@ -13,17 +13,13 @@
     {% include 'components/header.html' %}
 
     <div class="company-banner">
-      <img src="https://via.placeholder.com/900x150" alt="Company Banner" />
+      <img src="{{company_info.banner}}" alt="Company Banner" />
       <div class="company-header">
-        <img
-          src="https://via.placeholder.com/80"
-          class="logo"
-          alt="LG CNS logo"
-        />
+        <img src="{{company_info.logo}}" class="logo" alt="LG CNS logo" />
         <div class="info">
-          <h2>LG CNS Việt Nam</h2>
-          <p>LG CNS - Công ty IT số 1 Hàn Quốc</p>
-          <span class="job-count">15 vị trí tuyển dụng</span>
+          <h2>{{company_info.name}}</h2>
+          <p>{{company_info.slogan}}</p>
+          <span class="job-count">{{ company_info.jobs | length }}</span>
         </div>
         <button class="follow-btn">Theo dõi</button>
       </div>
@@ -39,14 +35,13 @@
 
         <section>
           <h3>Về chúng tôi</h3>
-          <p>
-            Là Chuyên gia Chuyển đổi Kỹ thuật số (DX) và Đối tác tăng trưởng kỹ
-            thuật số, LG CNS đóng vai trò tiên phong trong các công nghệ như
-            Cloud, AI/Big Data, Smart Factory...
-          </p>
+          <p>{{ company_info.about_text }}</p>
           <div class="image-row">
-            <img src="https://via.placeholder.com/300x200" />
-            <img src="https://via.placeholder.com/300x200" />
+            <!-- ddung for -->
+            {% for image in company_info.about_images %}
+
+            <img src="{{image}}" />
+            {% endfor %}
           </div>
         </section>
 
@@ -101,21 +96,24 @@
       <aside class="sidebar">
         <div class="box">
           <h4>Thông tin chung</h4>
-          <p><strong>Lĩnh vực:</strong> Phần Mềm</p>
-          <p><strong>Quy mô:</strong> 100-499</p>
-          <p><strong>Quốc tịch:</strong> 🇰🇷 South Korea, 🇻🇳 Vietnam</p>
+          <p><strong>Lĩnh vực:</strong>{{company_info.field}}</p>
+          <p><strong>Quy mô:</strong>{{company_info.company_size}}</p>
           <div class="tags">
-            <span>Java</span><span>ReactJS</span><span>Spring</span>
+            {% for tag in company_info.skills %} {% if tag != "" %}
+            <span>{{ tag }}</span>
+            {% endif %} {% endfor %}
           </div>
         </div>
 
         <div class="box">
           <h4>Thông tin liên hệ</h4>
-          <p><strong>Website:</strong> <a href="#">careers.lg.com</a></p>
+          <p>
+            <strong>Website:</strong>
+            <a href="{{company_info.website}}">{{company_info.website}}</a>
+          </p>
           <p>
             <strong>Địa chỉ:</strong><br />
-            Tầng 15, tòa Keangnam Landmark 72, Nam Từ Liêm, Hà Nội<br />
-            Tầng 4, Youngjin E&C Hải Phòng
+            {{company_info.address}}
           </p>
         </div>
       </aside>
