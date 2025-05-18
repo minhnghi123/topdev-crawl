@@ -18,76 +18,80 @@
         <div class="dropdown" onmouseenter="openDropdown(this)" onmouseleave="closeDropdown(this)">
           <a href="#" class="dropdown-toggle">Việc Làm IT</a>
             <div class="dropdown-menu">
+              <!-- Theo cấp bậc -->
               <div class="dropdown-item has-submenu">
                 <a href="#">Theo cấp bậc</a>
                 <div class="submenu">
-                  <a href="#">Intern</a>
-                  <a href="#">Fresher</a>
-                  <a href="#">Junior</a>
-                  <a href="#">Middle</a>
-                  <a href="#">Senior</a>
-                  <a href="#">Trưởng Nhóm</a>
-                  <a href="#">Trưởng phòng</a>
-                  <a href="#">All Levels</a>
+                  <a href="/jobs?level=Intern">Intern</a>
+                  <a href="/jobs?level=Fresher">Fresher</a>
+                  <a href="/jobs?level=Junior">Junior</a>
+                  <a href="/jobs?level=Middle">Middle</a>
+                  <a href="/jobs?level=Senior">Senior</a>
+                  <a href="/jobs?level=Trưởng Nhóm">Trưởng Nhóm</a>
+                  <a href="/jobs?level=Trưởng phòng">Trưởng phòng</a>
+                  <a href="/jobs">All Levels</a>
                 </div>
               </div>
 
+              <!-- Theo loại hình -->
               <div class="dropdown-item has-submenu">
                 <a href="#">Theo loại hình</a>
                 <div class="submenu">
-                  <a href="#">In Office</a>
-                  <a href="#">Hybrid</a>
-                  <a href="#">Remote</a>
-                  <a href="#">Oversea</a>
+                  <a href="/jobs?type=In Office">In Office</a>
+                  <a href="/jobs?type=Hybrid">Hybrid</a>
+                  <a href="/jobs?type=Remote">Remote</a>
+                  <a href="/jobs?type=Oversea">Oversea</a>
                 </div>
               </div>
 
+              <!-- Theo địa điểm -->
               <div class="dropdown-item has-submenu">
                 <a href="#">Theo địa điểm</a>
                 <div class="submenu">
-                  <a href="#">Hồ Chí Minh</a>
-                  <a href="#">Hà Nội</a>
-                  <a href="#">Đà Nẵng</a>
-                  <a href="#">Cần Thơ</a>
-                  <a href="#">Khác</a>
+                  <a href="/jobs?location=Hồ Chí Minh">Hồ Chí Minh</a>
+                  <a href="/jobs?location=Hà Nội">Hà Nội</a>
+                  <a href="/jobs?location=Đà Nẵng">Đà Nẵng</a>
+                  <a href="/jobs?location=Cần Thơ">Cần Thơ</a>
+                  <a href="/jobs?location=Khác">Khác</a>
                 </div>
               </div>
 
+              <!-- Theo kỹ năng -->
               <div class="dropdown-item has-submenu">
                 <a href="#">Theo kỹ năng</a>
                 <div class="submenu multi-column">
                   <div class="column">
-                    <a href="#">JavaScript</a>
-                    <a href="#">Java</a>
-                    <a href="#">.NET</a>
-                    <a href="#">C#</a>
-                    <a href="#">PHP</a>
-                    <a href="#">Python</a>
-                    <a href="#">C++</a>
-                    <a href="#">iOS</a>
-                    <a href="#">Android</a>
-                    <a href="#">Mobile</a>
+                    <a href="/jobs?skill=JavaScript">JavaScript</a>
+                    <a href="/jobs?skill=Java">Java</a>
+                    <a href="/jobs?skill=.NET">.NET</a>
+                    <a href="/jobs?skill=C#">C#</a>
+                    <a href="/jobs?skill=PHP">PHP</a>
+                    <a href="/jobs?skill=Python">Python</a>
+                    <a href="/jobs?skill=C++">C++</a>
+                    <a href="/jobs?skill=iOS">iOS</a>
+                    <a href="/jobs?skill=Android">Android</a>
+                    <a href="/jobs?skill=Mobile">Mobile</a>
                   </div>
                   <div class="column">
-                    <a href="#">Flutter</a>
-                    <a href="#">React Native</a>
-                    <a href="#">Tester</a>
-                    <a href="#">Product Manager</a>
-                    <a href="#">Business Analyst</a>
-                    <a href="#">Project Manager</a>
-                    <a href="#">System Admin</a>
-                    <a href="#">DevOps</a>
-                    <a href="#">System Engineer</a>
-                    <a href="#">Data Analyst</a>
+                    <a href="/jobs?skill=Flutter">Flutter</a>
+                    <a href="/jobs?skill=React Native">React Native</a>
+                    <a href="/jobs?skill=Tester">Tester</a>
+                    <a href="/jobs?skill=Product Manager">Product Manager</a>
+                    <a href="/jobs?skill=Business Analyst">Business Analyst</a>
+                    <a href="/jobs?skill=Project Manager">Project Manager</a>
+                    <a href="/jobs?skill=System Admin">System Admin</a>
+                    <a href="/jobs?skill=DevOps">DevOps</a>
+                    <a href="/jobs?skill=System Engineer">System Engineer</a>
+                    <a href="/jobs?skill=Data Analyst">Data Analyst</a>
                   </div>
                   <div class="column">
-                    <a href="#">Game</a>
-                    <a href="#">Designer</a>
-                    <a href="#">Golang</a>
-                    <a href="#">AWS</a>
-                    <a href="#">Azure</a>
-                    <a href="#">Cloud</a>
-                    <a href="#">UI/UX</a>
+                    <a href="/jobs?skill=Game">Game</a>
+                    <a href="/jobs?skill=Designer">Designer</a>
+                    <a href="/jobs?skill=Golang">Golang</a>
+                    <a href="/jobs?skill=AWS">AWS</a>
+                    <a href="/jobs?skill=Azure">Azure</a>
+                    <a href="/jobs?skill=Cloud">Cloud</a>
+                    <a href="/jobs?skill=UI/UX">UI/UX</a>
                   </div>
                 </div>
               </div>
@@ -99,10 +103,9 @@
     </div>
 
     <div class="right">
-      <span class="phone"><i class="phone-icon">📞</i> 028 6273 3496</span>
+      <span class="phone"><i class="phone-icon">📞</i> 0  123456789</span>
       <a href="#" class="btn-outlined">Nhà tuyển dụng</a>
       <a href="#" class="btn-filled">Đăng nhập</a>
-      <span class="lang-switch">EN | VI</span>
     </div>
   </div>
 </header>
