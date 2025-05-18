@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ job.title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jobs_detail.css') }}">
+</head>
+<body>
+    {% include 'components/header.html' %}
+    <div class="job-detail-wrapper">
+        <div class="job-detail-card">
+            <div class="job-header">
+                <div class="job-header-info">
+                    <h1 class="job-title">{{ job.title }}</h1>
+                    <div class="job-company">{{ job.company }}</div>
+                    <div class="job-location"><i class="fa fa-map-marker"></i> {{ job.location }}</div>
+                </div>
+                <a href="#" class="apply-btn">Ứng tuyển ngay</a>
+            </div>
+            <div class="job-main-info">
+                <div><strong>Cấp bậc:</strong> {{ job.level or "Không rõ" }}</div>
+                <div><strong>Loại hình:</strong> {{ job.type or "Không rõ" }}</div>
+                <div><strong>Kỹ năng:</strong>
+                    {% for skill in job.skills %}
+                        <span class="job-skill">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="job-description">
+                <h2>Mô tả công việc</h2>
+                <div>{{ job.description or job.html|safe }}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

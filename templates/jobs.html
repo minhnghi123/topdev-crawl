@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách công việc</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jobs.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include 'components/header.html' %}
+    <h1 style="text-align:center;">Danh sách công việc</h1>
+    <div class="main-content">
+        <div class="filter-sidebar">
+            <h3>Bộ lọc</h3>
+            <form method="get" action="">
+                <!-- Từ khóa -->
+                <label for="keyword">Từ khóa:</label>
+                <input type="text" id="keyword" name="keyword" placeholder="Nhập từ khóa..." style="width:100%;margin-bottom:14px;">
+
+                <!-- Địa điểm -->
+                <label for="location">Địa điểm:</label>
+                <select id="location" name="location" style="width:100%;margin-bottom:14px;">
+                    <option value="">Tất cả</option>
+                    <option value="Hà Nội">Hà Nội</option>
+                    <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                    <option value="Đà Nẵng">Đà Nẵng</option>
+                    <option value="Khác">Khác</option>
+                </select>
+
+                <!-- Cấp bậc -->
+                <label for="level">Cấp bậc:</label>
+                <select id="level" name="level" style="width:100%;margin-bottom:14px;">
+                    <option value="">Tất cả</option>
+                    <option value="Fresher">Fresher</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                </select>
+
+                <!-- Kỹ năng -->
+                <label for="skill">Kỹ năng:</label>
+                <select id="skill" name="skill" style="width:100%;margin-bottom:14px;">
+                    <option value="">Tất cả</option>
+                    <option value="Java">Java</option>
+                    <option value="Python">Python</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="C#">C#</option>
+                    <option value="SQL">SQL</option>
+                    <option value="PMO">PMO</option>
+                    <option value="Business Analyst">Business Analyst</option>
+                    <!-- Thêm kỹ năng khác nếu cần -->
+                </select>
+
+                <!-- Loại hình -->
+                <label for="type">Loại hình:</label>
+                <select id="type" name="type" style="width:100%;margin-bottom:18px;">
+                    <option value="">Tất cả</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Remote">Remote</option>
+                    <option value="Intern">Intern</option>
+                </select>
+
+                <button type="submit" style="width:100%;">Lọc</button>
+            </form>
+        </div>
+        <div class="jobs-area">
+            <div class="jobs-grid">
+                {% for job in jobs %}
+                <a href="{{ url_for('main.job_detail', job_id=loop.index0) }}" class="job-card-link">
+                    <div class="job-card">
+                        <div class="job-logo-title">
+                            <img class="img-logo" src="{{ job.logo or url_for('static', filename='img/default-logo.png') }}" alt="{{ job.company }}">
+                            <div>
+                                <div class="job-title">{{ job.title }}</div>
+                                <div class="job-company">{{ job.company }}</div>
+                            </div>
+                        </div>
+                        <div class="job-info">
+                            <span class="job-salary">{{ job.salary or 'Thương lượng' }}</span> •
+                            <span class="job-level">{{ job.level or '' }}</span>
+                        </div>
+                        <div class="job-location">{{ job.location }}</div>
+                        <div class="job-desc">{{ job.description or '' }}</div>
+                        <div class="job-skills">
+                            {% for skill in job.skills %}
+                                <span class="job-skill">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+                {% else %}
+                <div>Không có công việc nào.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+    <script src="../static/js/dropdownHeader.js"></script>
+</html>
