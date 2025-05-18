@@ -53,8 +53,8 @@ def fetch_and_insert_jobs(api_url, db_file):
             INSERT OR IGNORE INTO job (
                 id, title, company_name, full_addresses, salary_min, salary_max, salary_currency, salary_unit, 
                 isNegotiableSalary, benefits, content, sort_addresses, published_date, refreshed_date, 
-                responsibilities, requirements, benefits_original, job_url
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                responsibilities, requirements, benefits_original, job_url,logo
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
             """, (
                 job.get("id"),
                 job.get("title", ""),
@@ -74,6 +74,7 @@ def fetch_and_insert_jobs(api_url, db_file):
                 job.get("requirements_original", ""),
                 json.dumps(job.get("benefits_original", [])),  # Serialize benefits_original
                 job.get("detail_url", "")
+                job.get("company", {}).get("image_logo", ""),
             ))
 
             # Xử lý skills_str

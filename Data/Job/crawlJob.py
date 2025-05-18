@@ -4,19 +4,93 @@ from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
 import json
+import re
+
+def parse_salary(salary):
+    salary_min = None
+    salary_max = None
+    salary_currency = None
+
+    if "Thương lượng" in salary:
+        # Trường hợp lương thương lượng
+        salary_min = None
+        salary_max = None
+    elif "Lên tới" in salary or "to" in salary:
+        # Trường hợp lương có "Lên tới" hoặc "to"
+        match = re.findall(r"([\d\.]+)", salary)
+        if len(match) == 1:
+            # Nếu chỉ có một số, đó là salary_max
+            salary_max = int(match[0].replace(".", ""))
+        elif len(match) == 2:
+            # Nếu có hai số, lấy salary_min và salary_max
+            salary_min = int(match[0].replace(".", ""))
+            salary_max = int(match[1].replace(".", ""))
+    else:
+        # Trường hợp khác (không có "Thương lượng" hoặc "Lên tới")
+        match = re.findall(r"([\d\.]+)", salary)
+        if len(match) == 2:
+            salary_min = int(match[0].replace(".", ""))
+            salary_max = int(match[1].replace(".", ""))
+
+    # Xác định đơn vị tiền tệ
+    if "USD" in salary:
+        salary_currency = "USD"
+    elif "VND" in salary:
+        salary_currency = "VND"
+
+    return salary_min, salary_max, salary_currency
+
+def split_job_description(job_description):
+    # Từ khóa tiếng Việt và tiếng Anh (không phân biệt hoa thường)
+    keywords = [
+        "trách nhiệm công việc",
+        "kỹ năng & chuyên môn",
+        "phúc lợi dành cho bạn",
+        "quy trình phỏng vấn",
+        "responsibilities",
+        "requirements",
+        "recruitment progress",
+        "benefit"
+    ]
+
+    # Chuyển từ khóa về chữ thường để so sánh
+    keywords_lower = [keyword.lower() for keyword in keywords]
+
+    # Tìm vị trí của các từ khóa trong job_description
+    sections = {}
+    current_section = "content"  # Phần đầu tiên không có từ khóa là content
+    sections[current_section] = ""
+
+    for line in job_description.splitlines():
+        line_lower = line.strip().lower()  # Chuyển dòng hiện tại về chữ thường
+        if any(keyword in line_lower for keyword in keywords_lower):
+            # Nếu dòng chứa từ khóa, chuyển sang phần mới
+            current_section = next(keyword for keyword in keywords_lower if keyword in line_lower)
+            sections[current_section] = ""
+        else:
+            # Thêm nội dung vào phần hiện tại
+            sections[current_section] += line + "\n"
+
+    # Loại bỏ khoảng trắng thừa
+    for key in sections:
+        sections[key] = sections[key].strip()
+    print(sections)
+    return sections
+
+
 # Khởi tạo trình duyệt
 driver = webdriver.Chrome()  # hoặc Firefox
 
-driver.get("https://accounts.topdev.vn/login/github")
+# driver.get("https://accounts.topdev.vn/login/github")
 
-time.sleep(3)
+# time.sleep(3)
 
-# username_input = driver.find_element(By.ID, "login_field")
-# password_input = driver.find_element(By.ID, "password")
+# # username_input = driver.find_element(By.ID, "login_field")
+# # password_input = driver.find_element(By.ID, "password")
 
-# password_input.send_keys(Keys.RETURN)
+# # password_input.send_keys(Keys.RETURN)
 
-time.sleep(40)
+# time.sleep(40)
 
 # # Nhập thông tin tài khoản
 # username_input.send_keys("hophuoc98765432@gmail.com")  # Thay "your_username" bằng tên đăng nhập của bạn
@@ -27,8 +101,8 @@ html = driver.page_source
 # Đợi trang tải xong (có thể điều chỉnh thời gian nếu cần)
 
 # Đường dẫn file chứa danh sách link
-job_links_file = r"D:\git\topdev-crawl\Data\Job\job_links_full.json"
-output_file = r"D:\git\topdev-crawl\Data\Job\job_info.json"
+job_links_file = r"Data/job/job_links_full.json"
+output_file = r"Data/job/job_links_full_2.json"
 
 # Đọc danh sách link từ file JSON
 with open(job_links_file, "r", encoding="utf-8") as f:
@@ -36,13 +110,16 @@ with open(job_links_file, "r", encoding="utf-8") as f:
 
 company_data = []
 # Crawl từng link
+job_links =["https://topdev.vn/viec-lam/it-support-o365-hn-english-fluent-night-shift-offer-up-to-24m-itechwx-company-limited-2035932?src=topdev_search&medium=searchresult"]
 for link in job_links:
-    
+    if not link.startswith("https://topdev.vn/viec-lam/"):
+        print(f"Link không hợp lệ: {link}")
+        continue
     try:
         # Mở trang web
         url = link
         driver.get(url)
-
+        time.sleep(2)
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
 
@@ -51,7 +128,9 @@ for link in job_links:
 
         # Tiêu đề công việc
         job_title = job_section.find('h1', class_='text-2xl font-bold text-black').text.strip() if job_section.find('h1', class_='text-2xl font-bold text-black') else None
+        logo_img = job_section.find("img") if job_section else None
 
+        img = logo_img["src"] if logo_img and "src" in logo_img.attrs else None
         # Tên công ty
         company_name = job_section.find('p', class_='my-1 line-clamp-1 text-base font-bold text-[#F05C43]').text.strip() if job_section.find('p', class_='my-1 line-clamp-1 text-base font-bold text-[#F05C43]') else None
 
@@ -69,10 +148,13 @@ for link in job_links:
         main_info = soup.find('div', class_='flex flex-col self-stretch p-[25px] pb-2')
         if main_info:
             # Lương
-            salary = None
+            salary_min = None
+            salary_max = None
+            salary_currency = None
             salary_tag = main_info.find('p', class_='text-primary')
             if salary_tag:
                 salary = salary_tag.text.strip()
+                salary_min, salary_max, salary_currency = parse_salary(salary)
 
             # Thời gian đăng và hết hạn
             posted_time = None
@@ -126,16 +208,20 @@ for link in job_links:
                 if contract_parent:
                     contract_type = contract_parent.text.strip()
 
-           
-
-
- 
-       
         job_description = None
+        job_description_sections = {
+            "content": None,
+            "RESPONSIBILITIES": None,
+            "Requirements": None,
+            "Recruitment Progress": None,
+            "BENEFIT": None
+        }
+
         job_desc_div = soup.find('div', id='JobDescription')
         if job_desc_div:
-            # Lấy toàn bộ HTML mô tả (nếu muốn lấy text thì dùng .get_text(separator="\n", strip=True))
-            job_description = job_desc_div.decode_contents().strip()
+            job_description = job_desc_div.get_text(separator="\n", strip=True)
+            job_description_sections = split_job_description(job_description)
+
 
 
         # Thêm vào danh sách dữ liệu
@@ -144,18 +230,24 @@ for link in job_links:
             "job_title": job_title,
             "company_name": company_name,
             "address": address,
+            "skills": skills,   
             "address_long": address_long,
-            "salary": salary,
+            "salary_min": salary_min,
+            "salary_max": salary_max,
+            "salary_currency": salary_currency,
             "posted_time": posted_time,
-            "expired_time": expired_time,
-            "skills": skills,
             "exp": exp,
             "level": level,
             "job_type": job_type,
             "contract_type": contract_type,
-            "job_description": job_description
+            "expired_time": expired_time,
+            "contract_type": contract_type,
+            "content": job_description_sections.get("content", ""),
+            "RESPONSIBILITIES": job_description_sections.get("RESPONSIBILITIES", "") + job_description_sections.get("trách nhiệm công việc", ""),
+            "Requirements": job_description_sections.get("Requirements", "") + job_description_sections.get("kỹ năng & chuyên môn", ""),
+            "Recruitment Progress": job_description_sections.get("Recruitment Progress", "") + job_description_sections.get("quy trình phỏng vấn", ""),
+            "BENEFIT": job_description_sections.get("BENEFIT", "") + job_description_sections.get("phúc lợi dành cho bạn", ""),
         })
-
         print(f"Đã crawl: {link}")
     except Exception as e:
         print(f"Lỗi khi crawl {link}: {e}")
