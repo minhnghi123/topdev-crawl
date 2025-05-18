@@ -8,6 +8,14 @@
       type="text/css"
       href="{{ url_for('static', filename='css/company_details.css') }}"
     />
+    <!-- Font Awesome CDN (latest version) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-1ycn6Ica999F+9Md+I+qU1lppKNlj7KjVwXzE/5UQYzRtA4gU0yKbFf7nAaFT6gxKJbIQ2F5W7uJ6+j3XKQyDg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
   </head>
   <body>
     {% include 'components/header.html' %}
@@ -15,11 +23,15 @@
     <div class="company-banner">
       <img src="{{company_info.banner}}" alt="Company Banner" />
       <div class="company-header">
-        <img src="{{company_info.logo}}" class="logo" alt="LG CNS logo" />
+        <img
+          src="{{company_info.Logo}}"
+          class="logo"
+          alt="{{company_info.name}}"
+        />
         <div class="info">
           <h2>{{company_info.name}}</h2>
-          <p>{{company_info.slogan}}</p>
-          <span class="job-count">{{ company_info.jobs | length }}</span>
+          <p>{{company_info.shortdescription}}</p>
+          <!-- <span class="job-count">{{ company_info.jobs | length }}</span> -->
         </div>
         <button class="follow-btn">Theo dõi</button>
       </div>
@@ -35,10 +47,13 @@
 
         <section>
           <h3>Về chúng tôi</h3>
-          <p>{{ company_info.about_text }}</p>
+          {% for paragraph in company_info.description.split('.') %} {% if
+          paragraph.strip() %}
+          <p>{{ paragraph.strip() }}.</p>
+          {% endif %} {% endfor %}
           <div class="image-row">
             <!-- ddung for -->
-            {% for image in company_info.about_images %}
+            {% for image in about_images %}
 
             <img src="{{image}}" />
             {% endfor %}
@@ -96,13 +111,15 @@
       <aside class="sidebar">
         <div class="box">
           <h4>Thông tin chung</h4>
-          <p><strong>Lĩnh vực:</strong>{{company_info.field}}</p>
-          <p><strong>Quy mô:</strong>{{company_info.company_size}}</p>
+          <p><strong>Lĩnh vực: </strong>{{company_info.industry}}</p>
+          <p><strong>Quy mô: </strong>{{company_info.size}}</p>
           <div class="tags">
-            {% for tag in company_info.skills %} {% if tag != "" %}
-            <span>{{ tag }}</span>
+            <p><strong>Công nghệ:</strong></p>
+            {% for tag in skills %} {% if tag != "" %}
+            <span>{{ tag.name }}</span>
             {% endif %} {% endfor %}
           </div>
+          <p><strong>Quốc gia: </strong>{{company_info.nationality}}</p>
         </div>
 
         <div class="box">
@@ -115,6 +132,25 @@
             <strong>Địa chỉ:</strong><br />
             {{company_info.address}}
           </p>
+          {% for social in social_media %}
+          <p>
+            <a href="{{ social }}" target="_blank">
+              {% if 'facebook.com' in social.lower() %}
+              <i class="fab fa-facebook"></i>
+              {% elif 'linkedin.com' in social.lower() %}
+              <i class="fab fa-linkedin"></i>
+              {% elif 'youtube.com' in social.lower() %}
+              <i class="fab fa-youtube"></i>
+              {% elif 'twitter.com' in social.lower() %}
+              <i class="fab fa-twitter"></i>
+              {% elif 'instagram.com' in social.lower() %}
+              <i class="fab fa-instagram"></i>
+              {% else %}
+              <i class="fas fa-globe"></i>
+              {% endif %} {{ social }}
+            </a>
+          </p>
+          {% endfor %}
         </div>
       </aside>
     </div>

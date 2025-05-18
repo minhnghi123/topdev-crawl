@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-# Initialize SQLAlchemy (to be used in your Flask app)
 db = SQLAlchemy()
 
 class JobType(db.Model):
