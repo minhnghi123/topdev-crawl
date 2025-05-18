@@ -6,14 +6,29 @@
     <title>Top Công Ty</title>
     <link
       rel="stylesheet"
-      type="text/css"
       href="{{ url_for('static', filename='css/company.css') }}"
     />
     <link
       rel="stylesheet"
-      type="text/css"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
+    <style>
+      .load-more {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .load-more a {
+        background: #e74c3c;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: 0.3s;
+      }
+      .load-more a:hover {
+        background: #c0392b;
+      }
+    </style>
   </head>
   <body>
     {% include 'components/header.html' %}
@@ -27,15 +42,8 @@
       <button>Tìm</button>
     </div>
 
-    <div class="tabs">
-      <button class="active">Công Ty Hàng Đầu</button>
-      <button>Công Ty Được Theo Dõi Nhiều</button>
-      <button>Công Ty Có Việc Làm Mới Nhất</button>
-      <button>Công Ty Đang Chờ Đón Bạn</button>
-    </div>
-
     <section class="section">
-      <h2 class="section-title">Công ty có việc làm mới nhất</h2>
+      <h2 class="section-title">Tất cả các công ty</h2>
       <div class="company-grid">
         {% for company in companies %}
         <div class="company-card">
@@ -56,12 +64,18 @@
             <p class="industry">{{ company.industry }}</p>
             <div class="job-follow-row">
               <span>{{ company.followers }} 👥</span>
-              {% if company.curent_job_opening != "0" %}
-              <a class="job-link" href="/company/{{company.id}}" target="_blank"
-                >{{ company.curent_job_opening }} Job →</a
+              {% if company.curent_job_opening != 0 %}
+              <a
+                class="job-link"
+                href="/company/{{ company.id }}"
+                target="_blank"
+                >{{ company.curent_job_opening }} Job</a
               >
               {% else %}
-              <a class="job-link" href="/company/{{company.id}}" target="_blank"
+              <a
+                class="job-link"
+                href="/company/{{ company.id }}"
+                target="_blank"
                 >Xem chi tiết</a
               >
               {% endif %}
@@ -70,9 +84,37 @@
         </div>
         {% endfor %}
       </div>
+
+      {% if total_pages > 1 %}
+      <nav class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('main.company', page=page - 1) }}">‹ Trước</a>
+        {% endif %} {% set start_page = page - 2 if page - 2 > 1 else 1 %} {%
+        set end_page = page + 2 if page + 2 < total_pages else total_pages %} {%
+        if start_page > 1 %}
+        <a href="{{ url_for('main.company', page=1) }}">1</a>
+        {% if start_page > 2 %}
+        <span>...</span>
+        {% endif %} {% endif %} {% for p in range(start_page, end_page + 1) %}
+        {% if p == page %}
+        <span class="current">{{ p }}</span>
+        {% else %}
+        <a href="{{ url_for('main.company', page=p) }}">{{ p }}</a>
+        {% endif %} {% endfor %} {% if end_page < total_pages %} {% if end_page
+        < total_pages - 1 %}
+        <span>...</span>
+        {% endif %}
+        <a href="{{ url_for('main.company', page=total_pages) }}"
+          >{{ total_pages }}</a
+        >
+        {% endif %} {% if page < total_pages %}
+        <a href="{{ url_for('main.company', page=page + 1) }}">Tiếp ›</a>
+        {% endif %}
+      </nav>
+      {% endif %}
     </section>
 
-    <script src="../static/js/company.js"></script>
-    <script src="../static/js/dropdownHeader.js"></script>
+    <script src="{{ url_for('static', filename='js/company.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dropdownHeader.js') }}"></script>
   </body>
 </html>

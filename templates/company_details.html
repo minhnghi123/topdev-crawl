@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Chi tiết công ty - LG CNS</title>
+    <title>Chi tiết công ty -{{company_info.name}}</title>
     <link
       rel="stylesheet"
       type="text/css"
@@ -12,9 +12,6 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      integrity="sha512-1ycn6Ica999F+9Md+I+qU1lppKNlj7KjVwXzE/5UQYzRtA4gU0yKbFf7nAaFT6gxKJbIQ2F5W7uJ6+j3XKQyDg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
     />
   </head>
   <body>
@@ -40,56 +37,43 @@
     <div class="container">
       <div class="main-content">
         <div class="tabs">
-          <button class="active">Thông tin công ty</button>
-          <button>Sản phẩm</button>
-          <button>Vị trí tuyển dụng</button>
+          <button class="active" onclick="scrollToSection('about')">
+            Thông tin công ty
+          </button>
+
+          <button onclick="scrollToSection('products')">Sản phẩm</button>
+
+          <button onclick="scrollToSection('jobs')">Vị trí tuyển dụng</button>
         </div>
 
-        <section>
+        <section id="about">
           <h3>Về chúng tôi</h3>
-          {% for paragraph in company_info.description.split('.') %} {% if
-          paragraph.strip() %}
-          <p>{{ paragraph.strip() }}.</p>
-          {% endif %} {% endfor %}
+          {% for paragraph in company_info.description_paragraphs %}
+          <p>{{ paragraph }}</p>
+          {% endfor %}
           <div class="image-row">
-            <!-- ddung for -->
             {% for image in about_images %}
-
-            <img src="{{image}}" />
+            <img src="{{image}}" alt="Ảnh giới thiệu công ty" />
             {% endfor %}
           </div>
         </section>
 
-        <section>
-          <h3>Chế độ đãi ngộ</h3>
-          <ul>
-            <li>Lương tháng 13 và thưởng hiệu suất cuối năm</li>
-            <li>Trợ cấp: Ăn trưa, đi lại, sinh nhật, sinh con...</li>
-            <li>Chăm sóc sức khỏe, khám định kỳ</li>
-            <li>Teambuilding, happy hour, sinh nhật...</li>
-          </ul>
-        </section>
-
-        <section>
+        {% if products and products | length > 0 %}
+        <section id="products">
           <h3>Sản phẩm</h3>
           <div class="products">
+            {% for product in products %}
             <div class="product-box">
-              <strong>Cloud</strong>
-              <p>
-                Provides optimized cloud services across many business areas.
-              </p>
+              <strong>{{ product.name }}</strong>
+              <p>{{ product.description }}</p>
+              <img src="{{product.image}}" alt="{{product.name}}" />
             </div>
-            <div class="product-box">
-              <strong>AI/Big Data</strong>
-              <p>
-                Optimal services through big data collection and verified AI
-                services.
-              </p>
-            </div>
+            {% endfor %}
           </div>
         </section>
+        {% endif %}
 
-        <section>
+        <section id="jobs">
           <h3>Vị trí tuyển dụng</h3>
           <div class="job-card">
             <h4>TeamCenter Engineer (React, BMiDE)</h4>
@@ -125,35 +109,51 @@
         <div class="box">
           <h4>Thông tin liên hệ</h4>
           <p>
-            <strong>Website:</strong>
+            <strong>Website</strong>
             <a href="{{company_info.website}}">{{company_info.website}}</a>
           </p>
           <p>
-            <strong>Địa chỉ:</strong><br />
+            <strong>Địa chỉ</strong><br />
             {{company_info.address}}
           </p>
-          {% for social in social_media %}
-          <p>
-            <a href="{{ social }}" target="_blank">
-              {% if 'facebook.com' in social.lower() %}
-              <i class="fab fa-facebook"></i>
-              {% elif 'linkedin.com' in social.lower() %}
-              <i class="fab fa-linkedin"></i>
-              {% elif 'youtube.com' in social.lower() %}
+          <!-- Chỉ icon, không hiển thị link text -->
+          <p><strong>Mạng xã hội</strong></p>
+          <div class="social-icons">
+            {% for social in social_media %} {% set lower_social = social|lower
+            %}
+            <a href="{{ social }}" target="_blank" class="social-icon">
+              {% if 'facebook.com' in lower_social %}
+              <i class="fab fa-facebook-f"></i>
+              {% elif 'linkedin.com' in lower_social %}
+              <i class="fab fa-linkedin-in"></i>
+              {% elif 'youtube.com' in lower_social %}
               <i class="fab fa-youtube"></i>
-              {% elif 'twitter.com' in social.lower() %}
+              {% elif 'twitter.com' in lower_social %}
               <i class="fab fa-twitter"></i>
-              {% elif 'instagram.com' in social.lower() %}
+              {% elif 'instagram.com' in lower_social %}
               <i class="fab fa-instagram"></i>
               {% else %}
               <i class="fas fa-globe"></i>
-              {% endif %} {{ social }}
+              {% endif %}
             </a>
-          </p>
-          {% endfor %}
+            {% endfor %}
+          </div>
         </div>
       </aside>
     </div>
     <script src="../static/js/dropdownHeader.js"></script>
+    <script>
+      function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+        // Cập nhật tab active
+        document
+          .querySelectorAll(".tabs button")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+      }
+    </script>
   </body>
 </html>
