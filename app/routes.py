@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, jsonify
 import json, os, re
 from app.models import Company, Products, Skill,CompanySkills
+import re
+import math
 
 main = Blueprint("main", __name__)
 
@@ -12,19 +14,36 @@ def extract_logo_url(html):
         return match.group(1)
     return None
 
+def smart_split(text):
+    sentence_end = re.compile(r'(?<!\w\.\w)(?<![A-Z][a-z]\.)(?<!\d)\.(?!\d)')
+    return [s.strip() + '.' for s in sentence_end.split(text) if s.strip()]
 @main.route("/")
 def home():
     return render_template("index.html")
 
 @main.route("/company")
 def company():
-    companies = Company.query.all(); 
-    return render_template("company.html", companies=companies)
+    per_page = 40
+    page = int(request.args.get("page", 1))
+    companies = Company.query.all()
+    
+    total_companies = len(companies)
+    total_pages = math.ceil(total_companies / per_page)
 
+    paginated = companies[(page - 1) * per_page : page * per_page]
+
+    return render_template(
+        "company.html",
+        companies=paginated,
+        page=page,
+        total_pages=total_pages
+    )
 
 @main.route("/company/<int:company_id>")
 def company_details(company_id):
     company_info = Company.query.get_or_404(company_id)
+    company_info.description_paragraphs = smart_split(company_info.description)
+
     # divide and convert about_images to list
     about_images = company_info.about_images.split(',') if company_info.about_images else []
     # get products by company_id
