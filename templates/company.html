@@ -41,33 +41,27 @@
         <div class="company-card">
           <div
             class="company-background"
-            style="background-image: url('{{ company.background_image }}');"
+            style="background-image: url('{{ company.banner }}');"
           >
             <img
               class="company-logo"
-              src="{{ company.logo }}"
+              src="{{ company.Logo }}"
               alt="{{ company.name }}"
             />
           </div>
           <div class="company-content">
             <h3>{{ company.name }}</h3>
-            <p class="slogan">{{ company.description }}</p>
-            <p class="location">{{ company.location }}</p>
+            <p class="slogan">{{ company.shortdescription }}</p>
+            <p class="location">{{ company.short_address }}</p>
             <p class="industry">{{ company.industry }}</p>
             <div class="job-follow-row">
               <span>{{ company.followers }} 👥</span>
-              {% if company.jobs_count != "0" %}
-              <a
-                class="job-link"
-                href="/company/{{loop.index-1}}"
-                target="_blank"
-                >{{ company.jobs_count }} Job →</a
+              {% if company.curent_job_opening != "0" %}
+              <a class="job-link" href="/company/{{company.id}}" target="_blank"
+                >{{ company.curent_job_opening }} Job →</a
               >
               {% else %}
-              <a
-                class="job-link"
-                href="/company/{{loop.index-1}}"
-                target="_blank"
+              <a class="job-link" href="/company/{{company.id}}" target="_blank"
                 >Xem chi tiết</a
               >
               {% endif %}
