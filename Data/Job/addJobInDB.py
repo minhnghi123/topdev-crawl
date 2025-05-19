@@ -130,3 +130,5 @@ def fetch_and_insert_jobs(api_url, db_file):
 api_url = "https://api.topdev.vn/td/v2/jobs"
 db_file = "D:/18052025/topdev-crawl/Data/crawl.db"
 fetch_and_insert_jobs(api_url, db_file)
+
+

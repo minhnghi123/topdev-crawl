@@ -5,6 +5,7 @@ import time
 from bs4 import BeautifulSoup
 import json
 import re
+from datetime import datetime, timedelta
 
 def parse_salary(salary):
     salary_min = None
@@ -41,7 +42,7 @@ def parse_salary(salary):
     return salary_min, salary_max, salary_currency
 
 def split_job_description(job_description):
-    # Từ khóa tiếng Việt và tiếng Anh (không phân biệt hoa thường)
+    # Định nghĩa các từ khóa section (không phân biệt hoa thường)
     keywords = [
         "trách nhiệm công việc",
         "kỹ năng & chuyên môn",
@@ -52,45 +53,75 @@ def split_job_description(job_description):
         "recruitment progress",
         "benefit"
     ]
+    # Tạo regex pattern cho từng từ khóa
+    pattern = re.compile(
+        r"^(%s)\s*:?\s*$" % "|".join(re.escape(k) for k in keywords),
+        re.IGNORECASE | re.MULTILINE
+    )
 
-    # Chuyển từ khóa về chữ thường để so sánh
-    keywords_lower = [keyword.lower() for keyword in keywords]
-
-    # Tìm vị trí của các từ khóa trong job_description
+    # Tìm vị trí các section
+    matches = list(pattern.finditer(job_description))
     sections = {}
-    current_section = "content"  # Phần đầu tiên không có từ khóa là content
-    sections[current_section] = ""
+    if not matches:
+        sections["content"] = job_description.strip()
+        return sections
 
-    for line in job_description.splitlines():
-        line_lower = line.strip().lower()  # Chuyển dòng hiện tại về chữ thường
-        if any(keyword in line_lower for keyword in keywords_lower):
-            # Nếu dòng chứa từ khóa, chuyển sang phần mới
-            current_section = next(keyword for keyword in keywords_lower if keyword in line_lower)
-            sections[current_section] = ""
-        else:
-            # Thêm nội dung vào phần hiện tại
-            sections[current_section] += line + "\n"
+    # Thêm phần đầu nếu có
+    if matches[0].start() > 0:
+        sections["content"] = job_description[:matches[0].start()].strip()
 
-    # Loại bỏ khoảng trắng thừa
-    for key in sections:
-        sections[key] = sections[key].strip()
-    print(sections)
+    for i, match in enumerate(matches):
+        section_name = match.group(1).strip().lower()
+        section_start = match.end()
+        section_end = matches[i + 1].start() if i + 1 < len(matches) else len(job_description)
+        section_content = job_description[section_start:section_end].strip()
+        sections[section_name] = section_content
+
     return sections
 
+def parse_relative_time(text, now=None):
+    if now is None:
+        now = datetime.now()
+    text = str(text).strip()
+    match = re.match(r"(\d+)\s+(giờ|ngày|tuần)\s+(trước|tới)", text)
+    if not match:
+        return text  # Giữ nguyên nếu không đúng định dạng
+    value, unit, direction = match.groups()
+    value = int(value)
+    if unit == "giờ":
+        delta = timedelta(hours=value)
+    elif unit == "ngày":
+        delta = timedelta(days=value)
+    elif unit == "tuần":
+        delta = timedelta(weeks=value)
+    else:
+        return text
+    if direction == "trước":
+        dt = now - delta
+    else:  # "tới"
+        dt = now + delta
+    return dt.isoformat(sep=" ", timespec="seconds")
+
+def convert_salary_to_int(salary):
+    if salary is None:
+        return None
+    if isinstance(salary, str):
+        return salary.replace("*", "0")
+    return salary
 
 # Khởi tạo trình duyệt
 driver = webdriver.Chrome()  # hoặc Firefox
 
-# driver.get("https://accounts.topdev.vn/login/github")
+driver.get("https://accounts.topdev.vn/login/github")
 
-# time.sleep(3)
+time.sleep(3)
 
-# # username_input = driver.find_element(By.ID, "login_field")
-# # password_input = driver.find_element(By.ID, "password")
+# username_input = driver.find_element(By.ID, "login_field")
+# password_input = driver.find_element(By.ID, "password")
 
-# # password_input.send_keys(Keys.RETURN)
+# password_input.send_keys(Keys.RETURN)
 
-# time.sleep(40)
+time.sleep(40)
 
 # # Nhập thông tin tài khoản
 # username_input.send_keys("hophuoc98765432@gmail.com")  # Thay "your_username" bằng tên đăng nhập của bạn
@@ -110,7 +141,7 @@ with open(job_links_file, "r", encoding="utf-8") as f:
 
 company_data = []
 # Crawl từng link
-job_links =["https://topdev.vn/viec-lam/it-support-o365-hn-english-fluent-night-shift-offer-up-to-24m-itechwx-company-limited-2035932?src=topdev_search&medium=searchresult"]
+now = datetime.now()
 for link in job_links:
     if not link.startswith("https://topdev.vn/viec-lam/"):
         print(f"Link không hợp lệ: {link}")
@@ -208,7 +239,7 @@ for link in job_links:
                 if contract_parent:
                     contract_type = contract_parent.text.strip()
 
-        job_description = None
+        job_desc_div = soup.find('div', id='JobDescription')
         job_description_sections = {
             "content": None,
             "RESPONSIBILITIES": None,
@@ -216,37 +247,39 @@ for link in job_links:
             "Recruitment Progress": None,
             "BENEFIT": None
         }
-
-        job_desc_div = soup.find('div', id='JobDescription')
         if job_desc_div:
-            job_description = job_desc_div.get_text(separator="\n", strip=True)
-            job_description_sections = split_job_description(job_description)
+            job_desc_text = job_desc_div.get_text(separator="\n", strip=True)
+            sections = split_job_description(job_desc_text)
+            print(sections)
+            job_description_sections["content"] = job_desc_text
+            job_description_sections["RESPONSIBILITIES"] = sections.get("responsibilities", "") + " " + sections.get("trách nhiệm công việc", "")
+            job_description_sections["Requirements"] = sections.get("requirements", "") + " " +  sections.get("kỹ năng & chuyên môn", "")
+            job_description_sections["Recruitment Progress"] = sections.get("recruitment progress", "") + " " +  sections.get("quy trình phỏng vấn", "")
+            job_description_sections["BENEFIT"] = sections.get("benefit", "") + " " +  sections.get("phúc lợi dành cho bạn", "")
 
-
-
-        # Thêm vào danh sách dữ liệu
+        # Thêm vào danh sách dữ liệu (áp dụng chuyển đổi)
         company_data.append({
             "url": url,
             "job_title": job_title,
+            "logo": img,
             "company_name": company_name,
             "address": address,
             "skills": skills,   
             "address_long": address_long,
-            "salary_min": salary_min,
-            "salary_max": salary_max,
+            "salary_min": convert_salary_to_int(salary_min),
+            "salary_max": convert_salary_to_int(salary_max),
             "salary_currency": salary_currency,
-            "posted_time": posted_time,
+            "posted_time": parse_relative_time(posted_time, now) if posted_time else None,
             "exp": exp,
             "level": level,
             "job_type": job_type,
             "contract_type": contract_type,
-            "expired_time": expired_time,
-            "contract_type": contract_type,
+            "expired_time": parse_relative_time(expired_time, now) if expired_time else None,
             "content": job_description_sections.get("content", ""),
-            "RESPONSIBILITIES": job_description_sections.get("RESPONSIBILITIES", "") + job_description_sections.get("trách nhiệm công việc", ""),
-            "Requirements": job_description_sections.get("Requirements", "") + job_description_sections.get("kỹ năng & chuyên môn", ""),
-            "Recruitment Progress": job_description_sections.get("Recruitment Progress", "") + job_description_sections.get("quy trình phỏng vấn", ""),
-            "BENEFIT": job_description_sections.get("BENEFIT", "") + job_description_sections.get("phúc lợi dành cho bạn", ""),
+            "RESPONSIBILITIES": sections.get("responsibilities", "") + " " + sections.get("trách nhiệm công việc", ""),
+            "Requirements": sections.get("requirements", "") + " " + sections.get("kỹ năng & chuyên môn", ""),
+            "Recruitment Progress": sections.get("recruitment progress", "") + " " + sections.get("quy trình phỏng vấn", ""),
+            "BENEFIT": sections.get("benefit", "") + " " + sections.get("phúc lợi dành cho bạn", ""),
         })
         print(f"Đã crawl: {link}")
     except Exception as e:
