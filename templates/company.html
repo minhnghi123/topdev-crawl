@@ -33,14 +33,29 @@
   <body>
     {% include 'components/header.html' %}
 <form class="search-header" method="get" action="{{ url_for('main.company') }}">
-  <input type="text" name="keyword" placeholder="Nhập Từ Khóa Công Ty" value="{{ request.args.get('keyword', '') }}">
-  <select name="location">
-    <option value="">Địa Điểm</option>
-    <option value="Hà Nội" {% if request.args.get('location') == 'Hà Nội' %}selected{% endif %}>Hà Nội</option>
-    <option value="Hồ Chí Minh" {% if request.args.get('location') == 'Hồ Chí Minh' %}selected{% endif %}>Hồ Chí Minh</option>
+  <input type="text" name="keyword" placeholder="Nhập Từ Khóa Công Ty" value="{{ keyword or '' }}">
+
+  <select name="city" id="city-select">
+    <option value="">Chọn Thành Phố</option>
+    {% for city_name in city_map.keys() %}
+      <option value="{{ city_name }}" {% if city == city_name %}selected{% endif %}>
+        {{ city_name }}
+      </option>
+    {% endfor %}
   </select>
+
+  <select name="district" id="district-select">
+    <option value="">Chọn Quận / Huyện</option>
+    {% if city and city_map.get(city) %}
+      {% for d in city_map[city] %}
+        <option value="{{ d }}" {% if d == district %}selected{% endif %}>{{ d }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+
   <button type="submit">Tìm</button>
 </form>
+
 
 
     <section class="section">
@@ -127,5 +142,26 @@
 
     <script src="{{ url_for('static', filename='js/company.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dropdownHeader.js') }}"></script>
+    <script>
+  const cityMap = {{ city_map | tojson }};
+  const citySelect = document.getElementById("city-select");
+  const districtSelect = document.getElementById("district-select");
+
+  citySelect.addEventListener("change", function () {
+    const selectedCity = this.value;
+    const districts = cityMap[selectedCity] || [];
+
+    // Reset district select
+    districtSelect.innerHTML = '<option value="">Chọn Quận / Huyện</option>';
+
+    districts.forEach(d => {
+      const option = document.createElement("option");
+      option.value = d;
+      option.textContent = d;
+      districtSelect.appendChild(option);
+    });
+  });
+</script>
+
   </body>
 </html>
