@@ -81,7 +81,7 @@ def company():
     total_pages = math.ceil(total_companies / per_page)
     paginated = query.offset((page - 1) * per_page).limit(per_page).all()
 
-    # ✅ Quét full danh sách để tách thành phố & quận
+    #  Quét full danh sách để tách thành phố & quận
     all_companies = Company.query.all()
     city_map = {}  # {"Hồ Chí Minh": ["Quận 1", "Quận 3", ...], ...}
 
@@ -116,15 +116,87 @@ def company_details(company_id):
     company_info = Company.query.get_or_404(company_id)
     company_info.description_paragraphs = smart_split(company_info.description)
 
-    # divide and convert about_images to list
+    # about images
     about_images = company_info.about_images.split(',') if company_info.about_images else []
-    # get products by company_id
+
+    # products
     products = Products.query.filter_by(company_id=company_id).all()
-    # get all skills by company_id
-    skills = Skill.query.join(CompanySkills, CompanySkills.skill_id == Skill.id).filter(CompanySkills.company_id == company_id).all()
-    # convert social_media to list
-    social_media = company_info.Social_media.split(',') if company_info.Social_media else [] 
-    return render_template("company_details.html", company_info=company_info, about_images=about_images, products=products, skills=skills,social_media=social_media)
+
+    # skills
+    skills = Skill.query.join(CompanySkills, CompanySkills.skill_id == Skill.id)\
+        .filter(CompanySkills.company_id == company_id).all()
+    company_skill_ids = {s.id for s in skills}
+
+    # social
+    social_media = company_info.Social_media.split(',') if company_info.Social_media else []
+
+    # === Suggestions using scoring logic ===
+    def extract_city(address):
+        return address.split(',')[-1].strip().lower() if address else ''
+
+    this_city = extract_city(company_info.short_address)
+
+    # Get all other companies except current one
+    all_other_companies = Company.query.filter(Company.id != company_id).all()
+
+    # Preload all company skills in one query
+    all_skills_map = {
+        cs.company_id: set()
+        for cs in CompanySkills.query.filter(CompanySkills.company_id != company_id).all()
+    }
+    for cs in CompanySkills.query.filter(CompanySkills.company_id != company_id).all():
+        all_skills_map.setdefault(cs.company_id, set()).add(cs.skill_id)
+
+    suggestions = []
+
+    for comp in all_other_companies:
+        if comp.id == company_id:
+            continue  # redundant but safe
+
+        score = 0
+
+        # 1. Industry match
+        if comp.industry == company_info.industry:
+            score += 3
+
+        # 2. Size match
+        if comp.size == company_info.size:
+            score += 2
+
+        # 3. City match
+        comp_city = extract_city(comp.short_address)
+        if this_city and comp_city and this_city == comp_city:
+            score += 2
+
+        # 4. Shared skills
+        shared_skills = company_skill_ids & all_skills_map.get(comp.id, set())
+        score += len(shared_skills)
+
+        if score > 0:
+            suggestions.append((comp, score))
+
+    # Sort by score descending
+    sorted_suggestions = sorted(suggestions, key=lambda x: x[1], reverse=True)
+
+    # Remove duplicates (by comp.id) and limit to 6
+    seen_ids = set()
+    final_suggestions = []
+    for comp, _ in sorted_suggestions:
+        if comp.id not in seen_ids:
+            final_suggestions.append(comp)
+            seen_ids.add(comp.id)
+        if len(final_suggestions) >= 6:
+            break
+
+    return render_template(
+        "company_details.html",
+        company_info=company_info,
+        about_images=about_images,
+        products=products,
+        skills=skills,
+        social_media=social_media,
+        suggestions=final_suggestions
+    )
 
 @main.route("/jobs")
 def jobs():
