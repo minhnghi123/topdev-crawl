@@ -124,7 +124,15 @@ def company_details(company_id):
     skills = Skill.query.join(CompanySkills, CompanySkills.skill_id == Skill.id).filter(CompanySkills.company_id == company_id).all()
     # convert social_media to list
     social_media = company_info.Social_media.split(',') if company_info.Social_media else [] 
-    return render_template("company_details.html", company_info=company_info, about_images=about_images, products=products, skills=skills,social_media=social_media)
+    # lấy job của công ty
+    jobs = Job.query.filter_by(id_company=company_id).all()
+    jobs_list = []
+    for job in jobs:
+        job_dict = job.__dict__.copy()
+        if isinstance(job_dict.get('skills'), str):
+            job_dict['skills'] = [s.strip() for s in job_dict['skills'].split(',') if s.strip()]
+        jobs_list.append(job_dict)
+    return render_template("company_details.html", company_info=company_info, about_images=about_images, products=products, skills=skills, social_media=social_media, jobs=jobs_list)
 
 @main.route("/jobs")
 def jobs():
@@ -216,6 +224,21 @@ def job_detail(job_id):
         salary_str = "Thương lượng"
     job_dict['salary'] = salary_str
     job_dict['refreshed_date_relative'] = to_relative_time(job_dict.get('refreshed_date'))
+
+    # Lấy thông tin công ty nếu có id_company
+    company_info = None
+    if job_dict.get('id_company'):
+        company = Company.query.get(job_dict['id_company'])
+        if company:
+            company_info = {
+                "name": company.name,
+                "size": company.size,
+                "industry": company.industry,
+                "address": company.address,
+                "logo": company.Logo,
+                "id": company.id,
+            }
+    job_dict['company_info'] = company_info
 
     return render_template("job_detail.html", job=job_dict)
 

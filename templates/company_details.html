@@ -75,20 +75,21 @@
 
         <section id="jobs">
           <h3>Vị trí tuyển dụng</h3>
-          <div class="job-card">
-            <h4>TeamCenter Engineer (React, BMiDE)</h4>
-            <p>LG CNS Việt Nam - Hà Nội (In Office)</p>
-            <div class="tags">
-              <span>Java</span><span>Docker</span><span>React</span>
-            </div>
-          </div>
-          <div class="job-card">
-            <h4>IBM Maximo Developer</h4>
-            <p>LG CNS Việt Nam - Hà Nội (In Office)</p>
-            <div class="tags">
-              <span>Java</span><span>Python</span><span>SQL Server</span>
-            </div>
-          </div>
+          {% for job in jobs %}
+          <a href="{{ url_for('main.job_detail', job_id=job.id) }}"
+            ><div class="job-card">
+              <h4>{{ job.title }}</h4>
+              <p>{{ job.company }} - {{ job.sort_addresses }}</p>
+              <div class="tags">
+                {% for skill in job.skills %}
+                <span>{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div></a>
+          {% endfor %}
+          {% if jobs | length == 0 %}
+          <p>Hiện tại không có vị trí tuyển dụng nào.</p>
+          {% endif %}
         </section>
       </div>
 
