@@ -116,16 +116,7 @@ def company_details(company_id):
     company_info = Company.query.get_or_404(company_id)
     company_info.description_paragraphs = smart_split(company_info.description)
 
-    # about images
-    about_images = company_info.about_images.split(',') if company_info.about_images else []
-
-    # products
-    products = Products.query.filter_by(company_id=company_id).all()
-    # get all skills by company_id
-    skills = Skill.query.join(CompanySkills, CompanySkills.skill_id == Skill.id).filter(CompanySkills.company_id == company_id).all()
-    # convert social_media to list
-    social_media = company_info.Social_media.split(',') if company_info.Social_media else [] 
-    # lấy job của công ty
+  # lấy job của công ty
     jobs = Job.query.filter_by(id_company=company_id).all()
     jobs_list = []
     for job in jobs:
@@ -133,13 +124,15 @@ def company_details(company_id):
         if isinstance(job_dict.get('skills'), str):
             job_dict['skills'] = [s.strip() for s in job_dict['skills'].split(',') if s.strip()]
         jobs_list.append(job_dict)
-    return render_template("company_details.html", company_info=company_info, about_images=about_images, products=products, skills=skills, social_media=social_media, jobs=jobs_list)
+    # about images
+    about_images = company_info.about_images.split(',') if company_info.about_images else []
 
-    # skills
+    # products
+    products = Products.query.filter_by(company_id=company_id).all()
+     # skills
     skills = Skill.query.join(CompanySkills, CompanySkills.skill_id == Skill.id)\
         .filter(CompanySkills.company_id == company_id).all()
     company_skill_ids = {s.id for s in skills}
-
     # social
     social_media = company_info.Social_media.split(',') if company_info.Social_media else []
 
@@ -200,7 +193,6 @@ def company_details(company_id):
             seen_ids.add(comp.id)
         if len(final_suggestions) >= 6:
             break
-
     return render_template(
         "company_details.html",
         company_info=company_info,
@@ -208,7 +200,8 @@ def company_details(company_id):
         products=products,
         skills=skills,
         social_media=social_media,
-        suggestions=final_suggestions
+        suggestions=final_suggestions,
+        jobs=jobs_list,
     )
 
 @main.route("/jobs")
