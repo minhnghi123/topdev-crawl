@@ -1,11 +1,30 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, current_app
 import json, os, re
 from app.models import Company, Products, Skill, CompanySkills, Job
 import re
 import math
 from datetime import datetime, timedelta
+from sklearn.tree import DecisionTreeClassifier
+import numpy as np
+from ml.decision_tree_recommender import DecisionTreeRecommender
 
 main = Blueprint("main", __name__)
+
+recommender = DecisionTreeRecommender()
+
+def build_recommender_model():
+    all_jobs = Job.query.all()
+    # Convert skills string to list for all jobs
+    for j in all_jobs:
+        if isinstance(j.skills, str):
+            j.skills = [s.strip() for s in j.skills.split(',') if s.strip()]
+    # Fit with dummy current_job=None (labels will be all 0)
+    recommender.fit(all_jobs)
+
+@main.record_once
+def on_load(state):
+    with state.app.app_context():
+        build_recommender_model()
 
 def extract_logo_url(html):
     if not html:
@@ -18,7 +37,6 @@ def extract_logo_url(html):
 def smart_split(text):
     sentence_end = re.compile(r'(?<!\w\.\w)(?<![A-Z][a-z]\.)(?<!\d)\.(?!\d)')
     return [s.strip() + '.' for s in sentence_end.split(text) if s.strip()]
-from datetime import datetime, timedelta
 
 def to_relative_time(target_time, now=None):
     if now is None:
@@ -240,5 +258,19 @@ def job_detail(job_id):
             }
     job_dict['company_info'] = company_info
 
-    return render_template("job_detail.html", job=job_dict)
+    # --- Recommend jobs using pre-built Decision Tree ---
+    all_jobs = Job.query.filter(Job.id != job.id).all()
+    for j in all_jobs:
+        if isinstance(j.skills, str):
+            j.skills = [s.strip() for s in j.skills.split(',') if s.strip()]
+    recommended_jobs = recommender.recommend(job, all_jobs, n=5)
+    recommended_jobs_list = []
+    for rec_job in recommended_jobs:
+        rec_dict = rec_job.__dict__.copy()
+        if isinstance(rec_dict.get('skills'), str):
+            rec_dict['skills'] = [s.strip() for s in rec_dict['skills'].split(',') if s.strip()]
+        rec_dict['salary'] = "Thương lượng"
+        recommended_jobs_list.append(rec_dict)
+
+    return render_template("job_detail.html", job=job_dict, recommended_jobs=recommended_jobs_list)
 

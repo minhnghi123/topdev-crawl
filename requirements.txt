@@ -10,3 +10,5 @@ requests==2.32.3
 beautifulsoup4==4.13.4
 selenium
 flask_sqlalchemy
+scikit-learn
+numpy

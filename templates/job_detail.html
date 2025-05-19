@@ -34,7 +34,7 @@
                         <span id="job-location-text">{{ job.sort_addresses }}</span>
                     </div>
                 </div>
-                <a href="#" class="apply-btn">Ứng tuyển ngay</a>
+                <a target="_blank" href="{{ job.job_url }}" class="apply-btn">Ứng tuyển ngay</a>
             </div>
             <div class="job-main-info">
                 <div>
@@ -118,7 +118,8 @@
                         {% endif %}
                         {% if job.company_info.website %}
                         <span style="margin-left:12px;"><b>Website:</b>
-                            <a href="{{ job.company_info.website }}" target="_blank" style="color:#1976d2;">{{ job.company_info.website }}</a>
+                            <a href="{{ job.company_info.website }}" target="_blank" style="color:#1976d2;">{{
+                                job.company_info.website }}</a>
                         </span>
                         {% endif %}
                         <p class="slogan">{{ job.company_info.shortdescription }}</p>
@@ -133,17 +134,45 @@
             </div>
             {% endif %}
         </div>
+
+        <div class="job-detail-card">
+            <h2> Công việc được đề xuất</h2>
+            {% if recommended_jobs %}
+            <ul style="list-style:none;padding:0;">
+                {% for rec in recommended_jobs %}
+                <li style="margin-bottom:18px;">
+                    <a href="{{ url_for('main.job_detail', job_id=rec.id) }}" style="font-weight:600;font-size:1.05rem;color:#1976d2;text-decoration:none;">
+                        {{ rec.title }}
+                    </a>
+                    <div style="color:#666;">{{ rec.company or rec.company_name }}</div>
+                    <div style="font-size:0.95rem;">
+                        {% if rec.skills %}
+                        <span>Kỹ năng: {{ rec.skills|join(', ') }}</span>
+                        {% endif %}
+                        {% if rec.salary %}
+                        <span style="margin-left:12px;">Lương: {{ rec.salary }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div>Không có đề xuất phù hợp.</div>
+            {% endif %}
+        </div>
+
     </div>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var loc = document.getElementById("job-location-text");
-        var full = {{ job.full_addresses|tojson }};
+        document.addEventListener("DOMContentLoaded", function () {
+            var loc = document.getElementById("job-location-text");
+            var full = {{ job.full_addresses| tojson
+        }};
         var shortAddr = "{{ job.sort_addresses }}";
         if (loc && full) {
-            loc.addEventListener("mouseenter", function() {
+            loc.addEventListener("mouseenter", function () {
                 loc.textContent = full;
             });
-            loc.addEventListener("mouseleave", function() {
+            loc.addEventListener("mouseleave", function () {
                 loc.textContent = shortAddr;
             });
         }
