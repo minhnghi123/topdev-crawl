@@ -32,15 +32,31 @@
   </head>
   <body>
     {% include 'components/header.html' %}
-    <div class="search-header">
-      <input type="text" placeholder="Nhập Từ Khóa Công Ty" />
-      <select>
-        <option>Địa Điểm</option>
-        <option>Hà Nội</option>
-        <option>Hồ Chí Minh</option>
-      </select>
-      <button>Tìm</button>
-    </div>
+<form class="search-header" method="get" action="{{ url_for('main.company') }}">
+  <input type="text" name="keyword" placeholder="Nhập Từ Khóa Công Ty" value="{{ keyword or '' }}">
+
+  <select name="city" id="city-select">
+    <option value="">Chọn Thành Phố</option>
+    {% for city_name in city_map.keys() %}
+      <option value="{{ city_name }}" {% if city == city_name %}selected{% endif %}>
+        {{ city_name }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <select name="district" id="district-select">
+    <option value="">Chọn Quận / Huyện</option>
+    {% if city and city_map.get(city) %}
+      {% for d in city_map[city] %}
+        <option value="{{ d }}" {% if d == district %}selected{% endif %}>{{ d }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+
+  <button type="submit">Tìm</button>
+</form>
+
+
 
     <section class="section">
       <h2 class="section-title">Tất cả các công ty</h2>
@@ -86,35 +102,66 @@
       </div>
 
       {% if total_pages > 1 %}
-      <nav class="pagination">
-        {% if page > 1 %}
-        <a href="{{ url_for('main.company', page=page - 1) }}">‹ Trước</a>
-        {% endif %} {% set start_page = page - 2 if page - 2 > 1 else 1 %} {%
-        set end_page = page + 2 if page + 2 < total_pages else total_pages %} {%
-        if start_page > 1 %}
-        <a href="{{ url_for('main.company', page=1) }}">1</a>
-        {% if start_page > 2 %}
-        <span>...</span>
-        {% endif %} {% endif %} {% for p in range(start_page, end_page + 1) %}
-        {% if p == page %}
-        <span class="current">{{ p }}</span>
-        {% else %}
-        <a href="{{ url_for('main.company', page=p) }}">{{ p }}</a>
-        {% endif %} {% endfor %} {% if end_page < total_pages %} {% if end_page
-        < total_pages - 1 %}
-        <span>...</span>
-        {% endif %}
-        <a href="{{ url_for('main.company', page=total_pages) }}"
-          >{{ total_pages }}</a
-        >
-        {% endif %} {% if page < total_pages %}
-        <a href="{{ url_for('main.company', page=page + 1) }}">Tiếp ›</a>
-        {% endif %}
-      </nav>
+<nav class="pagination">
+  {% if page > 1 %}
+    <a href="{{ url_for('main.company', page=page - 1, keyword=request.args.get('keyword', ''), location=request.args.get('location', '')) }}">‹ Trước</a>
+  {% endif %}
+
+  {% set start_page = page - 2 if page - 2 > 1 else 1 %}
+  {% set end_page = page + 2 if page + 2 < total_pages else total_pages %}
+
+  {% if start_page > 1 %}
+    <a href="{{ url_for('main.company', page=1, keyword=request.args.get('keyword', ''), location=request.args.get('location', '')) }}">1</a>
+    {% if start_page > 2 %}
+      <span>...</span>
+    {% endif %}
+  {% endif %}
+
+  {% for p in range(start_page, end_page + 1) %}
+    {% if p == page %}
+      <span class="current">{{ p }}</span>
+    {% else %}
+      <a href="{{ url_for('main.company', page=p, keyword=request.args.get('keyword', ''), location=request.args.get('location', '')) }}">{{ p }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if end_page < total_pages %}
+    {% if end_page < total_pages - 1 %}
+      <span>...</span>
+    {% endif %}
+    <a href="{{ url_for('main.company', page=total_pages, keyword=request.args.get('keyword', ''), location=request.args.get('location', '')) }}">{{ total_pages }}</a>
+  {% endif %}
+
+  {% if page < total_pages %}
+    <a href="{{ url_for('main.company', page=page + 1, keyword=request.args.get('keyword', ''), location=request.args.get('location', '')) }}">Tiếp ›</a>
+  {% endif %}
+</nav>
+
       {% endif %}
     </section>
 
     <script src="{{ url_for('static', filename='js/company.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dropdownHeader.js') }}"></script>
+    <script>
+  const cityMap = {{ city_map | tojson }};
+  const citySelect = document.getElementById("city-select");
+  const districtSelect = document.getElementById("district-select");
+
+  citySelect.addEventListener("change", function () {
+    const selectedCity = this.value;
+    const districts = cityMap[selectedCity] || [];
+
+    // Reset district select
+    districtSelect.innerHTML = '<option value="">Chọn Quận / Huyện</option>';
+
+    districts.forEach(d => {
+      const option = document.createElement("option");
+      option.value = d;
+      option.textContent = d;
+      districtSelect.appendChild(option);
+    });
+  });
+</script>
+
   </body>
 </html>

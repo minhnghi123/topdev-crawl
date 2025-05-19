@@ -63,19 +63,53 @@ def home():
 def company():
     per_page = 40
     page = int(request.args.get("page", 1))
-    companies = Company.query.all()
-    
-    total_companies = len(companies)
-    total_pages = math.ceil(total_companies / per_page)
 
-    paginated = companies[(page - 1) * per_page : page * per_page]
+    keyword = request.args.get("keyword", "").strip().lower()
+    city = request.args.get("city", "").strip()
+    district = request.args.get("district", "").strip()
+
+    query = Company.query
+
+    if keyword:
+        query = query.filter(Company.name.ilike(f"%{keyword}%"))
+    if district:
+        query = query.filter(Company.short_address.ilike(f"%{district}%"))
+    elif city:
+        query = query.filter(Company.short_address.ilike(f"%{city}%"))
+
+    total_companies = query.count()
+    total_pages = math.ceil(total_companies / per_page)
+    paginated = query.offset((page - 1) * per_page).limit(per_page).all()
+
+    # ✅ Quét full danh sách để tách thành phố & quận
+    all_companies = Company.query.all()
+    city_map = {}  # {"Hồ Chí Minh": ["Quận 1", "Quận 3", ...], ...}
+
+    for company in all_companies:
+        if not company.short_address:
+            continue
+        parts = [p.strip() for p in company.short_address.split(",")]
+        if len(parts) >= 2:
+            district_name = parts[0]
+            city_name = parts[-1]
+            if city_name not in city_map:
+                city_map[city_name] = set()
+            city_map[city_name].add(district_name)
+
+    # Convert sets to sorted lists
+    city_map = {city: sorted(list(districts)) for city, districts in city_map.items()}
 
     return render_template(
         "company.html",
         companies=paginated,
         page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        keyword=keyword,
+        city=city,
+        district=district,
+        city_map=city_map,
     )
+
 
 @main.route("/company/<int:company_id>")
 def company_details(company_id):
