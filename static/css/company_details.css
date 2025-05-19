@@ -325,3 +325,132 @@ i.fab,
 i.fas {
   font-size: 18px;
 }
+
+#similar-companies {
+  margin-top: 40px;
+}
+
+.company-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.suggestion-card {
+  background: #f9f9f9;
+  border-radius: 10px;
+  width: calc(33.33% - 13px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  transition: 0.3s ease;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-logo img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.suggestion-info h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.suggestion-info a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.suggestion-info a:hover {
+  text-decoration: underline;
+}
+
+.suggestion-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* fix images row */
+
+.image-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.image-row img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  flex: 1 1 200px; /* hình co giãn nhưng tối thiểu 200px */
+}
+/* rut gon */
+.product-description {
+  max-height: 120px;
+  overflow: hidden;
+  position: relative;
+  text-align: left;
+}
+
+.product-box.expanded .product-description {
+  max-height: none;
+}
+
+.read-more {
+  color: #007bff;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* products */
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.product-box {
+  flex: 1 1 250px;
+  max-width: 300px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.product-box img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .product-box {
+    max-width: 100%;
+  }
+
+  .image-row img {
+    flex: 1 1 100%;
+  }
+}

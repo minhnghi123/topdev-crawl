@@ -65,8 +65,11 @@
             {% for product in products %}
             <div class="product-box">
               <strong>{{ product.name }}</strong>
-              <p>{{ product.description }}</p>
-              <img src="{{product.image}}" alt="{{product.name}}" />
+              <div class="product-description">{{ product.description }}</div>
+              <div class="read-more" onclick="toggleExpand(this)">Xem thêm</div>
+              {% if product.link %}
+              <img src="{{ product.image }}" alt="{{ product.name }}" />
+              {% endif %}
             </div>
             {% endfor %}
           </div>
@@ -117,9 +120,10 @@
             <strong>Địa chỉ</strong><br />
             {{company_info.address}}
           </p>
-          <!-- Chỉ icon, không hiển thị link text -->
-          <p><strong>Mạng xã hội</strong></p>
+          {% if social_media and social_media | length > 0 %}
           <div class="social-icons">
+            <!-- Chỉ icon, không hiển thị link text -->
+            <p><strong>Mạng xã hội</strong></p>
             {% for social in social_media %} {% set lower_social = social|lower
             %}
             <a href="{{ social }}" target="_blank" class="social-icon">
@@ -139,9 +143,33 @@
             </a>
             {% endfor %}
           </div>
+          {% endif %}
         </div>
       </aside>
     </div>
+    <!-- Sau section "Vị trí tuyển dụng" -->
+    {% if suggestions and suggestions|length > 0 %}
+    <section id="similar-companies">
+      <h3>Các công ty tương tự</h3>
+      <div class="company-suggestions">
+        {% for company in suggestions %}
+        <div class="suggestion-card">
+          <div class="suggestion-logo">
+            <img src="{{ company.Logo }}" alt="{{ company.name }}" />
+          </div>
+          <div class="suggestion-info">
+            <h4><a href="/company/{{ company.id }}">{{ company.name }}</a></h4>
+            <p>{{ company.shortdescription }}</p>
+            <p><strong>Ngành:</strong> {{ company.industry }}</p>
+            {%if company_short_address %}
+            <p><strong>Địa chỉ:</strong> {{ company.short_address }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
     <script src="../static/js/dropdownHeader.js"></script>
     <script>
       function scrollToSection(id) {
@@ -154,6 +182,15 @@
           .querySelectorAll(".tabs button")
           .forEach((btn) => btn.classList.remove("active"));
         event.target.classList.add("active");
+      }
+    </script>
+    <script>
+      function toggleExpand(btn) {
+        const box = btn.closest(".product-box");
+        box.classList.toggle("expanded");
+        btn.textContent = box.classList.contains("expanded")
+          ? "Thu gọn"
+          : "Xem thêm";
       }
     </script>
   </body>
