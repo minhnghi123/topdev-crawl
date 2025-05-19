@@ -46,6 +46,18 @@ class Company(db.Model):
     short_address = db.Column(db.Text)
     followers = db.Column(db.Integer)
     about_images = db.Column(db.Text)
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'banner': self.banner,
+            'Logo': self.Logo,
+            'shortdescription': self.shortdescription,
+            'short_address': self.short_address,
+            'industry': self.industry,
+            'followers': self.followers,
+            'curent_job_opening': self.curent_job_opening
+        }
 
 class Job(db.Model):
     __tablename__ = 'job'

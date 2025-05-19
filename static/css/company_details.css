@@ -1,105 +1,144 @@
 :root {
   --primary-color: #e64523;
   --light-gray: #f5f6fa;
-  --text-color: #333;
+  --text-color: #2d2d2d;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   margin: 0;
   background-color: var(--light-gray);
   color: var(--text-color);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 .company-banner img {
   width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 1;
-  object-fit: cover;
-  background-color: #f0f0f0;
+  max-height: 280px;
+  object-fit: contain; /* <-- Ít zoom, giữ đủ hình */
+  object-position: center top;
+  border-bottom: 4px solid var(--primary-color);
+  background-color: #f2f2f2; /* Tùy chọn, để nếu có khoảng trắng */
 }
 
 .company-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   padding: 20px;
   background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--box-shadow);
 }
 
 .company-header .logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--border-radius);
   object-fit: contain;
   background: white;
-  border: 1px solid #eee;
-  padding: 5px;
+  border: 1px solid #ddd;
+  padding: 6px;
+}
+
+.company-header .info {
+  flex: 1;
+  min-width: 200px;
 }
 
 .company-header .info h2 {
   margin: 0;
-  font-size: 24px;
-}
-
-.follow-btn,
-.share-btn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .follow-btn {
+  margin-left: auto;
+  padding: 10px 20px;
   background-color: var(--primary-color);
   color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  white-space: nowrap;
 }
 
-.share-btn {
-  background-color: white;
-  border: 1px solid #ccc;
-  margin-left: 10px;
+.follow-btn:hover {
+  background-color: #c23a1d;
 }
 
 .container {
   display: flex;
+  flex-direction: column;
   max-width: 1200px;
-  margin: 30px auto;
-  gap: 30px;
+  margin: 40px auto;
+  gap: 32px;
+  padding: 0 16px;
+}
+
+@media (min-width: 992px) {
+  .container {
+    flex-direction: row;
+  }
 }
 
 .main-content {
   flex: 3;
+  order: 1;
+}
+
+.sidebar {
+  flex: 1;
+  order: 2;
 }
 
 .tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
 }
 
 .tabs button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: 1px solid #ddd;
+  border-radius: 6px;
   background: white;
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.tabs button.active {
+.tabs button.active,
+.tabs button:hover {
   background-color: var(--primary-color);
   color: white;
 }
 
 section {
   background: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 section h3 {
   margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
   color: var(--primary-color);
 }
 
@@ -107,6 +146,7 @@ section h3 {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .image-row img {
@@ -114,27 +154,118 @@ section h3 {
   height: 100px;
   object-fit: cover;
   border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.image-row img:hover {
+  transform: scale(1.05);
+}
+
+.view-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-more:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Image Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  overflow: auto;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.main-image {
+  max-width: 80%;
+  max-height: 70vh;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.thumbnail-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 80%;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+  opacity: 1;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.product-box,
+.job-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  border: 1px solid #eee;
+  box-shadow: var(--box-shadow);
+  flex: 1;
 }
 
 .products {
   display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
-.product-box {
-  background: #fafafa;
-  padding: 15px;
-  border-radius: 6px;
-  flex: 1;
-  border: 1px solid #eee;
+@media (min-width: 768px) {
+  .products {
+    flex-direction: row;
+  }
 }
 
 .job-card {
-  background: #fafafa;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  border: 1px solid #eee;
+  margin-bottom: 16px;
 }
 
 .tags {
@@ -145,24 +276,52 @@ section h3 {
   display: inline-block;
   background-color: #ffe9e4;
   color: var(--primary-color);
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 5px 12px;
+  border-radius: 14px;
   font-size: 13px;
   margin-right: 6px;
   margin-top: 6px;
 }
 
-.sidebar {
-  flex: 1;
-}
-
 .box {
   background: white;
   padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 .box h4 {
   margin-top: 0;
+  font-size: 18px;
+}
+
+.social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: background 0.3s ease;
+}
+
+.social-icon:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+i.fab,
+i.fas {
+  font-size: 18px;
 }
