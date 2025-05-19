@@ -190,6 +190,13 @@ h1 {
     font-size: 0.95rem;
     margin-bottom: 8px;
     min-height: 40px;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
 }
 
 .job-skills {

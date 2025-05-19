@@ -13,6 +13,7 @@
             cursor: pointer;
             margin-right: 2px;
         }
+
         .job-filter-link:hover {
             color: #c43f1d;
             text-decoration: underline;
@@ -39,29 +40,32 @@
                 <div>
                     <strong>Cấp bậc:</strong>
                     {% if job.level %}
-                        {% for level in job.level.split(',') %}
-                            <a href="{{ url_for('main.jobs', level=level.strip()) }}" class="job-filter-link">{{ level.strip() }}</a>{% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                    {% for level in job.level.split(',') %}
+                    <a href="{{ url_for('main.jobs', level=level.strip()) }}" class="job-filter-link">{{ level.strip()
+                        }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
                     {% else %}
-                        Không rõ
+                    Không rõ
                     {% endif %}
                 </div>
                 <div>
                     <strong>Loại hình:</strong>
                     {% if job.job_type %}
-                        {% for jt in job.job_type.split(',') %}
-                            <a href="{{ url_for('main.jobs', type=jt.strip()) }}" class="job-filter-link">{{ jt.strip() }}</a>{% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                    {% for jt in job.job_type.split(',') %}
+                    <a href="{{ url_for('main.jobs', type=jt.strip()) }}" class="job-filter-link">{{ jt.strip() }}</a>{%
+                    if not loop.last %}, {% endif %}
+                    {% endfor %}
                     {% else %}
-                        Không rõ
+                    Không rõ
                     {% endif %}
                 </div>
                 <div>
                     <strong>Kỹ năng:</strong>
                     {% if job.skills %}
-                        {% for skill in job.skills %}
-                            <a href="{{ url_for('main.jobs', skill=skill) }}" class="job-filter-link"><span class="job-skill">{{ skill }}</span></a>
-                        {% endfor %}
+                    {% for skill in job.skills %}
+                    <a href="{{ url_for('main.jobs', skill=skill) }}" class="job-filter-link"><span class="job-skill">{{
+                            skill }}</span></a>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <div><strong>Ngày đăng:</strong> {{ job.published_date or "Không rõ" }}</div>
@@ -87,6 +91,47 @@
                 <div>{{ job.interview|replace('\n', '<br>')|safe }}</div>
                 {% endif %}
             </div>
+            {% if job.company_info %}
+            <hr>
+            <h2> Thông tin về công ty</h2>
+
+            <div class="company-basic-info" style="display:flex;align-items:center;gap:18px;margin-bottom:18px;">
+                <a href="{{ url_for('main.company_details', company_id=job.company_info.id) }}">
+                    <img src="{{ job.company_info.logo or url_for('static', filename='img/default-logo.png') }}"
+                        alt="{{ job.company_info.name }}"
+                        style="width:60px;height:60px;object-fit:contain;border-radius:6px;border:1px solid #eee;background:#fff;">
+                </a>
+                <div>
+                    <a href="{{ url_for('main.company_details', company_id=job.company_info.id) }}"
+                        style="font-size:1.15rem;font-weight:600;color:#e14c2a;text-decoration:none;">
+                        {{ job.company_info.name }}
+                    </a>
+                    <div style="font-size:0.97rem;color:#666;">
+                        {% if job.company_info.size %}
+                        <span><b>Quy mô:</b> {{ job.company_info.size }}</span>
+                        {% endif %}
+                        {% if job.company_info.industry %}
+                        <span style="margin-left:12px;"><b>Lĩnh vực:</b> {{ job.company_info.industry }}</span>
+                        {% endif %}
+                        {% if job.company_info.nationality %}
+                        <span style="margin-left:12px;"><b>Quốc gia:</b> {{ job.company_info.nationality }}</span>
+                        {% endif %}
+                        {% if job.company_info.website %}
+                        <span style="margin-left:12px;"><b>Website:</b>
+                            <a href="{{ job.company_info.website }}" target="_blank" style="color:#1976d2;">{{ job.company_info.website }}</a>
+                        </span>
+                        {% endif %}
+                        <p class="slogan">{{ job.company_info.shortdescription }}</p>
+                    </div>
+                    {% if job.company_info.address %}
+                    <div style="font-size:0.95rem;color:#607d8b;">
+                        <i class="fa fa-map-marker"></i> {{ job.company_info.address }}
+
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     <script>

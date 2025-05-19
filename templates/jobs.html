@@ -81,8 +81,10 @@
                             <span class="job-salary">{{ job.salary or 'Thương lượng' }}</span> •
                             <span class="job-level">{{ job.level or '' }}</span>
                         </div>
-                        <div class="job-location">{{ job.location }}</div>
-                        <div class="job-desc">{{ job.description or '' }}</div>
+                        <div class="job-location">{{ job.sort_addresses }}</div>
+                        <div class="job-desc">
+                            {{ job.content|replace('\n', '<br>')|safe if job.content else '' }}
+                        </div>
                         <div class="job-skills">
                             {% for skill in job.skills %}
                                 <span class="job-skill">{{ skill }}</span>
