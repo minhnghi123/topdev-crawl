@@ -276,3 +276,34 @@ body {
 .nav-buttons button:hover {
   background-color: #0056b3;
 }
+/* pagnination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pagination a,
+.pagination span {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+.pagination a:hover {
+  background-color: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
+}
+
+.pagination .current {
+  background-color: #e74c3c;
+  color: white;
+  font-weight: bold;
+}

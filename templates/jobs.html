@@ -68,7 +68,7 @@
         <div class="jobs-area">
             <div class="jobs-grid">
                 {% for job in jobs %}
-                <a href="{{ url_for('main.job_detail', job_id=loop.index0) }}" class="job-card-link">
+                <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="job-card-link">
                     <div class="job-card">
                         <div class="job-logo-title">
                             <img class="img-logo" src="{{ job.logo or url_for('static', filename='img/default-logo.png') }}" alt="{{ job.company }}">
@@ -94,6 +94,40 @@
                 <div>Không có công việc nào.</div>
                 {% endfor %}
             </div>
+            {% if total_pages > 1 %}
+            {% set args = request.args.to_dict(flat=True) %}
+            {% set args_no_page = args.copy() %}
+            {% if 'page' in args_no_page %}{% set _ = args_no_page.pop('page') %}{% endif %}
+            <nav class="pagination">
+                {% if page > 1 %}
+                <a href="{{ url_for('main.jobs', page=page - 1, **args_no_page) }}">‹ Trước</a>
+                {% endif %}
+                {% set start_page = page - 2 if page - 2 > 1 else 1 %}
+                {% set end_page = page + 2 if page + 2 < total_pages else total_pages %}
+                {% if start_page > 1 %}
+                <a href="{{ url_for('main.jobs', page=1, **args_no_page) }}">1</a>
+                {% if start_page > 2 %}
+                <span>...</span>
+                {% endif %}
+                {% endif %}
+                {% for p in range(start_page, end_page + 1) %}
+                    {% if p == page %}
+                    <span class="current">{{ p }}</span>
+                    {% else %}
+                    <a href="{{ url_for('main.jobs', page=p, **args_no_page) }}">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if end_page < total_pages %}
+                    {% if end_page < total_pages - 1 %}
+                    <span>...</span>
+                    {% endif %}
+                    <a href="{{ url_for('main.jobs', page=total_pages, **args_no_page) }}">{{ total_pages }}</a>
+                {% endif %}
+                {% if page < total_pages %}
+                <a href="{{ url_for('main.jobs', page=page + 1, **args_no_page) }}">Tiếp ›</a>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
     </div>
 </body>

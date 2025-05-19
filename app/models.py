@@ -46,6 +46,7 @@ class Company(db.Model):
     short_address = db.Column(db.Text)
     followers = db.Column(db.Integer)
     about_images = db.Column(db.Text)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -63,18 +64,28 @@ class Job(db.Model):
     __tablename__ = 'job'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
-    name_company = db.Column(db.Text, nullable=False)
-    id_company = db.Column(db.Integer)
-    address = db.Column(db.Text)
-    salary = db.Column(db.Text)
-    date_expire = db.Column(db.Text)
-    experience = db.Column(db.Text)
-    skill_id = db.Column(db.Integer)
-    job_type_id = db.Column(db.Integer)
-    level_id = db.Column(db.Integer)
-    contract_type = db.Column(db.Integer)
-    description = db.Column(db.Text)
     logo = db.Column(db.Text)
+    company_name = db.Column(db.Text)
+    id_company = db.Column(db.Integer)
+    sort_addresses = db.Column(db.Text)
+    full_addresses = db.Column(db.Text)
+    salary_min = db.Column(db.Text)
+    salary_max = db.Column(db.Text)
+    salary_currency = db.Column(db.Text)
+    published_date = db.Column(db.Text)
+    refreshed_date = db.Column(db.Text)
+    experience = db.Column(db.Text)
+    contract_type = db.Column(db.Integer)
+    benefits = db.Column(db.Text)
+    content = db.Column(db.Text)
+    responsibilities = db.Column(db.Text)
+    requirements = db.Column(db.Text)
+    benefits_original = db.Column(db.Text)
+    job_url = db.Column(db.Text)
+    interview = db.Column(db.Text)
+    job_type = db.Column(db.Text)
+    level = db.Column(db.Text)
+    skills = db.Column(db.Text)
 
 class JobCompany(db.Model):
     __tablename__ = 'job_company'
@@ -84,22 +95,22 @@ class JobCompany(db.Model):
 class JobJobTypes(db.Model):
     __tablename__ = 'job_jobtypes'
     job_id = db.Column(db.Integer, primary_key=True)
-    job_type_id = db.Column(db.Integer)
+    job_type_id = db.Column(db.Integer, primary_key=True)
 
 class JobLevels(db.Model):
     __tablename__ = 'job_levels'
     job_id = db.Column(db.Integer, primary_key=True)
-    level_id = db.Column(db.Integer)
+    level_id = db.Column(db.Integer, primary_key=True)
 
 class JobSkills(db.Model):
     __tablename__ = 'job_skills'
     job_id = db.Column(db.Integer, primary_key=True)
-    skill_id = db.Column(db.Integer)
+    skill_id = db.Column(db.Integer, primary_key=True)
 
 class CompanySkills(db.Model):
     __tablename__ = 'company_skills'
     company_id = db.Column(db.Integer, primary_key=True)
-    skill_id = db.Column(db.Integer)
+    skill_id = db.Column(db.Integer, primary_key=True)
 
 class Skill(db.Model):
     __tablename__ = 'skill'
