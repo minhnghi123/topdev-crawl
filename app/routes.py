@@ -63,19 +63,38 @@ def home():
 def company():
     per_page = 40
     page = int(request.args.get("page", 1))
-    companies = Company.query.all()
-    
-    total_companies = len(companies)
+
+    # Lấy keyword và location từ URL
+    keyword = request.args.get("keyword", "").strip().lower()
+    location = request.args.get("location", "").strip()
+
+    # Bắt đầu query
+    query = Company.query
+
+    # Lọc theo từ khóa tên công ty
+    if keyword:
+        query = query.filter(Company.name.ilike(f"%{keyword}%"))
+
+    # Lọc theo địa điểm
+    if location:
+        query = query.filter(Company.address.ilike(f"%{location}%"))
+
+    # Tổng số công ty sau lọc
+    total_companies = query.count()
     total_pages = math.ceil(total_companies / per_page)
 
-    paginated = companies[(page - 1) * per_page : page * per_page]
+    # Phân trang
+    paginated = query.offset((page - 1) * per_page).limit(per_page).all()
 
     return render_template(
         "company.html",
         companies=paginated,
         page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        keyword=keyword,
+        location=location
     )
+
 
 @main.route("/company/<int:company_id>")
 def company_details(company_id):
