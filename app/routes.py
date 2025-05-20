@@ -56,6 +56,7 @@ def jobs():
     level = request.args.get('level', '')
     skill = request.args.get('skill', '')
     job_type = request.args.get('type', '')
+    sort = request.args.get('sort', '')  # Lấy tham số sắp xếp
 
     # Hàm kiểm tra từng điều kiện lọc
     def match(job):
@@ -80,6 +81,22 @@ def jobs():
 
     # Lọc danh sách công việc
     filtered_jobs = [job for job in jobs if match(job)]
+
+    # Sắp xếp theo yêu cầu
+    if sort == 'date_desc':
+        # Ưu tiên trường 'posted_time' nếu có, nếu không thì không sắp xếp
+        filtered_jobs.sort(key=lambda x: x.get('posted_time', ''), reverse=True)
+    elif sort == 'salary_desc':
+        import re
+        def parse_salary(s):
+            # Ví dụ: "Lên tới 50.000.000 VND" -> 50000000
+            if not s:
+                return 0
+            nums = re.findall(r'[\d\.]+', s.replace(',', ''))
+            if nums:
+                return int(nums[-1].replace('.', ''))
+            return 0
+        filtered_jobs.sort(key=lambda x: parse_salary(x.get('salary', '')), reverse=True)
 
     return render_template("jobs.html", jobs=filtered_jobs)
 @main.route("/job/<int:job_id>")
