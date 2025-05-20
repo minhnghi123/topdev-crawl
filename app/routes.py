@@ -1,33 +1,21 @@
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 import json, os, re
 from app.models import Company, Products, Skill, CompanySkills, Job
 import re
 import math
 from datetime import datetime, timedelta
-from sklearn.tree import DecisionTreeClassifier
 import numpy as np
-from ml.decision_tree_recommender import DecisionTreeRecommender
+from io import BytesIO
+import matplotlib.pyplot as plt
 
 main = Blueprint("main", __name__)
 
-recommender = DecisionTreeRecommender()
-
-def build_recommender_model():
-    all_jobs = Job.query.all()
-    # Convert skills string to list for all jobs
-    for j in all_jobs:
-        if isinstance(j.skills, str):
-            j.skills = [s.strip() for s in j.skills.split(',') if s.strip()]
-    # Fit with dummy current_job=None (labels will be all 0)
-    recommender.fit(all_jobs)
-
 @main.record_once
 def on_load(state):
-    with state.app.app_context():
-        build_recommender_model()
+    pass
 
 def extract_logo_url(html):
-    if not html:
+    if not html or not isinstance(html, (str, bytes)):
         return None
     match = re.search(r'<img[^>]+src="([^"]+)"', html)
     if match:
@@ -329,19 +317,167 @@ def job_detail(job_id):
             }
     job_dict['company_info'] = company_info
 
-    # --- Recommend jobs using pre-built Decision Tree ---
-    all_jobs = Job.query.filter(Job.id != job.id).all()
-    for j in all_jobs:
-        if isinstance(j.skills, str):
-            j.skills = [s.strip() for s in j.skills.split(',') if s.strip()]
-    recommended_jobs = recommender.recommend(job, all_jobs, n=5)
+    # === Recommended jobs logic ===
+    def extract_city(address):
+        return address.split(',')[-1].strip().lower() if address else ''
+
+    current_skills = set([s.lower() for s in job_dict.get('skills', [])])
+    current_city = extract_city(job_dict.get('sort_addresses'))
+    current_exp = job_dict.get('experience', '').strip().lower()
+
+    # Lấy tất cả job khác
+    all_jobs = Job.query.filter(Job.id != job_id).all()
+    suggestions = []
+
+    for other in all_jobs:
+        score = 0
+        # Chuẩn hóa skills
+        other_skills = set()
+        if isinstance(other.skills, str):
+            other_skills = set([s.strip().lower() for s in other.skills.split(',') if s.strip()])
+        elif isinstance(other.skills, list):
+            other_skills = set([s.strip().lower() for s in other.skills if s.strip()])
+        # 1. Shared skills
+        shared_skills = current_skills & other_skills
+        score += len(shared_skills)
+        # 2. City match
+        other_city = extract_city(other.sort_addresses)
+        if current_city and other_city and current_city == other_city:
+            score += 2
+        # 3. Experience match (năm kinh nghiệm)
+        other_exp = (other.experience or '').strip().lower()
+        if current_exp and other_exp and current_exp == other_exp:
+            score += 1
+        if score > 0:
+            suggestions.append((other, score))
+
+    # Sắp xếp theo điểm giảm dần
+    sorted_suggestions = sorted(suggestions, key=lambda x: x[1], reverse=True)
+    # Loại trùng id và lấy tối đa 6 job
+    seen_ids = set()
     recommended_jobs_list = []
-    for rec_job in recommended_jobs:
-        rec_dict = rec_job.__dict__.copy()
-        if isinstance(rec_dict.get('skills'), str):
-            rec_dict['skills'] = [s.strip() for s in rec_dict['skills'].split(',') if s.strip()]
-        rec_dict['salary'] = "Thương lượng"
-        recommended_jobs_list.append(rec_dict)
+    for job_obj, _ in sorted_suggestions:
+        if job_obj.id not in seen_ids:
+            # Chuyển sang dict cho template
+            job_obj_dict = job_obj.__dict__.copy()
+            if isinstance(job_obj_dict.get('skills'), str):
+                job_obj_dict['skills'] = [s.strip() for s in job_obj_dict['skills'].split(',') if s.strip()]
+            if not job_obj_dict.get('logo') and job_obj_dict.get('content'):
+                job_obj_dict['logo'] = extract_logo_url(job_obj_dict['content'])
+            # Xử lý salary cho job gợi ý
+            salary_min = job_obj_dict.get('salary_min')
+            salary_max = job_obj_dict.get('salary_max')
+            salary_currency = job_obj_dict.get('salary_currency')
+            salary_str = None
+            if salary_min and salary_max:
+                salary_str = f"{salary_min} - {salary_max} {salary_currency or ''}".strip()
+            elif salary_min:
+                salary_str = f"Từ {salary_min} {salary_currency or ''}".strip()
+            elif salary_max:
+                salary_str = f"Lên tới {salary_max} {salary_currency or ''}".strip()
+            else:
+                salary_str = "Thương lượng"
+            job_obj_dict['salary'] = salary_str
+            job_obj_dict['refreshed_date_relative'] = to_relative_time(job_obj_dict.get('refreshed_date'))
+            recommended_jobs_list.append(job_obj_dict)
+            seen_ids.add(job_obj.id)
+        if len(recommended_jobs_list) >= 6:
+            break
 
     return render_template("job_detail.html", job=job_dict, recommended_jobs=recommended_jobs_list)
+
+@main.route("/thongke")
+def thongke():
+    # Lấy tất cả jobs có lương
+    jobs = Job.query.filter(
+        (Job.salary_min != None) | (Job.salary_max != None)
+    ).all()
+    salary_data = []
+    usd_to_vnd = 25000
+    for job in jobs:
+        min_salary = job.salary_min
+        max_salary = job.salary_max
+        currency = (job.salary_currency or '').strip().upper()
+        # Chuyển kiểu dữ liệu nếu là str
+        try:
+            min_salary = float(min_salary) if min_salary is not None and min_salary != '' else None
+        except Exception:
+            min_salary = None
+        try:
+            max_salary = float(max_salary) if max_salary is not None and max_salary != '' else None
+        except Exception:
+            max_salary = None
+        if currency == "USD":
+            if min_salary: min_salary = min_salary * usd_to_vnd
+            if max_salary: max_salary = max_salary * usd_to_vnd
+        if not min_salary and not max_salary:
+            continue
+        avg_salary = None
+        if min_salary and max_salary:
+            avg_salary = (min_salary + max_salary) / 2
+        elif min_salary:
+            avg_salary = min_salary
+        elif max_salary:
+            avg_salary = max_salary
+        if avg_salary:
+            salary_data.append(avg_salary)
+    total_jobs = len(salary_data)
+    return render_template("thongke.html", total_jobs=total_jobs)
+
+@main.route("/thongke/chart.png")
+def thongke_chart():
+    # Lấy tất cả jobs có lương
+    jobs = Job.query.filter(
+        (Job.salary_min != None) | (Job.salary_max != None)
+    ).all()
+    salary_data = []
+    usd_to_vnd = 25000
+    for job in jobs:
+        min_salary = job.salary_min
+        max_salary = job.salary_max
+        currency = (job.salary_currency or '').strip().upper()
+        # Chuyển kiểu dữ liệu nếu là str
+        try:
+            min_salary = float(min_salary) if min_salary is not None and min_salary != '' else None
+        except Exception:
+            min_salary = None
+        try:
+            max_salary = float(max_salary) if max_salary is not None and max_salary != '' else None
+        except Exception:
+            max_salary = None
+        if currency == "USD":
+            if min_salary: min_salary = min_salary * usd_to_vnd
+            if max_salary: max_salary = max_salary * usd_to_vnd
+        if not min_salary and not max_salary:
+            continue
+        avg_salary = None
+        if min_salary and max_salary:
+            avg_salary = (min_salary + max_salary) / 2
+        elif min_salary:
+            avg_salary = min_salary
+        elif max_salary:
+            avg_salary = max_salary
+        if avg_salary:
+            salary_data.append(avg_salary)
+    bins = [0, 10_000_000, 20_000_000, 30_000_000, 50_000_000, 70_000_000, 100_000_000, float('inf')]
+    bin_labels = [
+        "<10tr", "10-20tr", "20-30tr", "30-50tr", "50-70tr", "70-100tr", ">100tr"
+    ]
+    bin_counts = [0] * (len(bins) - 1)
+    for s in salary_data:
+        for i in range(len(bins) - 1):
+            if bins[i] <= s < bins[i+1]:
+                bin_counts[i] += 1
+                break
+    plt.figure(figsize=(8,4))
+    plt.bar(bin_labels, bin_counts, color="#e14c2a")
+    plt.xlabel("Khoảng lương (VND)")
+    plt.ylabel("Số lượng công việc")
+    plt.title("Phân bố lương công việc")
+    plt.tight_layout()
+    buf = BytesIO()
+    plt.savefig(buf, format="png")
+    plt.close()
+    buf.seek(0)
+    return send_file(buf, mimetype='image/png')
 

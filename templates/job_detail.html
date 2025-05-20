@@ -139,19 +139,28 @@
             <h2> Công việc được đề xuất</h2>
             {% if recommended_jobs %}
             <ul style="list-style:none;padding:0;">
+
                 {% for rec in recommended_jobs %}
-                <li style="margin-bottom:18px;">
-                    <a href="{{ url_for('main.job_detail', job_id=rec.id) }}" style="font-weight:600;font-size:1.05rem;color:#1976d2;text-decoration:none;">
-                        {{ rec.title }}
+                <hr>
+                <li style="margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+                    <a href="{{ url_for('main.job_detail', job_id=rec.id) }}">
+                        <img src="{{ rec.logo or url_for('static', filename='img/default-logo.png') }}"
+                             alt="{{ rec.company or rec.company_name }}"
+                             style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #eee;background:#fff;">
                     </a>
-                    <div style="color:#666;">{{ rec.company or rec.company_name }}</div>
-                    <div style="font-size:0.95rem;">
-                        {% if rec.skills %}
-                        <span>Kỹ năng: {{ rec.skills|join(', ') }}</span>
-                        {% endif %}
-                        {% if rec.salary %}
-                        <span style="margin-left:12px;">Lương: {{ rec.salary }}</span>
-                        {% endif %}
+                    <div>
+                        <a href="{{ url_for('main.job_detail', job_id=rec.id) }}" style="font-weight:600;font-size:1.05rem;color:#1976d2;text-decoration:none;">
+                            {{ rec.title }}
+                        </a>
+                        <div style="color:#666;">{{ rec.company or rec.company_name }}</div>
+                        <div style="font-size:0.95rem;">
+                            {% if rec.skills %}
+                            <span>Kỹ năng: {{ rec.skills|join(', ') }}</span>
+                            {% endif %}
+                            {% if rec.salary %}
+                            <span style="margin-left:12px;">Lương: {{ rec.salary }}</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </li>
                 {% endfor %}

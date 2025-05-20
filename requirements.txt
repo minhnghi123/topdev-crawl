@@ -12,3 +12,4 @@ selenium
 flask_sqlalchemy
 scikit-learn
 numpy
+matplotlib==3.10.3
