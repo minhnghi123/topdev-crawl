@@ -233,6 +233,7 @@ def jobs():
     level = request.args.get('level', '')
     skill = request.args.get('skill', '')
     job_type = request.args.get('type', '')
+    sort = request.args.get('sort', '')  # Lấy tham số sắp xếp
 
     # Xây dựng query filter
     query = Job.query
