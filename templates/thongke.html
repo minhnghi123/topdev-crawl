@@ -11,13 +11,14 @@
     </style>
 </head>
 <body>
-        {% include 'components/header.html' %}
+    {% include 'components/header.html' %}
     <div class="container">
         <h1>Thống kê phân bố lương công việc</h1>
             <h4> Tỷ giá hối đoái 1 USD = 25.000 VNĐ </h4>
 
         <p>Tổng số công việc có lương: <b>{{ total_jobs }}</b></p>
         <img id="salaryChart" src="{{ url_for('main.thongke_chart') }}" alt="Biểu đồ lương công việc" width="600" height="350">
+       
     </div>
 </body>
 </html>

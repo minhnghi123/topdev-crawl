@@ -13,3 +13,5 @@ flask_sqlalchemy
 scikit-learn
 numpy
 matplotlib==3.10.3
+sentence_transformers
+faiss_cpu

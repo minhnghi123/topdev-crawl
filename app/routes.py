@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 import json, os, re
 from app.models import Company, Products, Skill, CompanySkills, Job
@@ -7,12 +9,18 @@ from datetime import datetime, timedelta
 import numpy as np
 from io import BytesIO
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import sys
+sys.path.append("ml")
+from ml import search
 
 main = Blueprint("main", __name__)
 
 @main.record_once
 def on_load(state):
-    pass
+    app = state.app
+    with app.app_context():
+        search.init_vector_dbs()
 
 def extract_logo_url(html):
     if not html or not isinstance(html, (str, bytes)):
@@ -76,8 +84,15 @@ def company():
 
     query = Company.query
 
+    company_ids = None
     if keyword:
-        query = query.filter(Company.name.ilike(f"%{keyword}%"))
+        # Sử dụng search_companies để lấy danh sách id phù hợp nhất
+        company_ids = search.search_companies(keyword, top_k=200)
+        if company_ids:
+            query = query.filter(Company.id.in_(company_ids))
+        else:
+            query = query.filter(False)  # Không có kết quả
+
     if district:
         query = query.filter(Company.short_address.ilike(f"%{district}%"))
     elif city:
@@ -223,13 +238,17 @@ def jobs():
     job_type = request.args.get('type', '')
     sort = request.args.get('sort', '')  # Lấy tham số sắp xếp
 
-    # Xây dựng query filter
     query = Job.query
 
+    job_ids = None
     if keyword:
-        query = query.filter(
-            (Job.title.ilike(f"%{keyword}%")) | (Job.company_name.ilike(f"%{keyword}%"))
-        )
+        # Sử dụng search_jobs để lấy danh sách id phù hợp nhất
+        job_ids = search.search_jobs(keyword, top_k=200)
+        if job_ids:
+            query = query.filter(Job.id.in_(job_ids))
+        else:
+            query = query.filter(False)  # Không có kết quả
+
     if location:
         query = query.filter(Job.sort_addresses.ilike(f"%{location}%"))
     if level:
