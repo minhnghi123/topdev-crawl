@@ -2,11 +2,16 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Chi tiết công ty - LG CNS</title>
+    <title>Chi tiết công ty -{{company_info.name}}</title>
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='css/company_details.css') }}"
+    />
+    <!-- Font Awesome CDN (latest version) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
   </head>
   <body>
@@ -15,11 +20,15 @@
     <div class="company-banner">
       <img src="{{company_info.banner}}" alt="Company Banner" />
       <div class="company-header">
-        <img src="{{company_info.logo}}" class="logo" alt="LG CNS logo" />
+        <img
+          src="{{company_info.Logo}}"
+          class="logo"
+          alt="{{company_info.name}}"
+        />
         <div class="info">
           <h2>{{company_info.name}}</h2>
-          <p>{{company_info.slogan}}</p>
-          <span class="job-count">{{ company_info.jobs | length }}</span>
+          <p>{{company_info.shortdescription}}</p>
+          <!-- <span class="job-count">{{ company_info.jobs | length }}</span> -->
         </div>
         <button class="follow-btn">Theo dõi</button>
       </div>
@@ -28,96 +37,161 @@
     <div class="container">
       <div class="main-content">
         <div class="tabs">
-          <button class="active">Thông tin công ty</button>
-          <button>Sản phẩm</button>
-          <button>Vị trí tuyển dụng</button>
+          <button class="active" onclick="scrollToSection('about')">
+            Thông tin công ty
+          </button>
+
+          <button onclick="scrollToSection('products')">Sản phẩm</button>
+
+          <button onclick="scrollToSection('jobs')">Vị trí tuyển dụng</button>
         </div>
 
-        <section>
+        <section id="about">
           <h3>Về chúng tôi</h3>
-          <p>{{ company_info.about_text }}</p>
+          {% for paragraph in company_info.description_paragraphs %}
+          <p>{{ paragraph }}</p>
+          {% endfor %}
           <div class="image-row">
-            <!-- ddung for -->
-            {% for image in company_info.about_images %}
-
-            <img src="{{image}}" />
+            {% for image in about_images %}
+            <img src="{{image}}" alt="Ảnh giới thiệu công ty" />
             {% endfor %}
           </div>
         </section>
 
-        <section>
-          <h3>Chế độ đãi ngộ</h3>
-          <ul>
-            <li>Lương tháng 13 và thưởng hiệu suất cuối năm</li>
-            <li>Trợ cấp: Ăn trưa, đi lại, sinh nhật, sinh con...</li>
-            <li>Chăm sóc sức khỏe, khám định kỳ</li>
-            <li>Teambuilding, happy hour, sinh nhật...</li>
-          </ul>
-        </section>
-
-        <section>
+        {% if products and products | length > 0 %}
+        <section id="products">
           <h3>Sản phẩm</h3>
           <div class="products">
+            {% for product in products %}
             <div class="product-box">
-              <strong>Cloud</strong>
-              <p>
-                Provides optimized cloud services across many business areas.
-              </p>
+              <strong>{{ product.name }}</strong>
+              <div class="product-description">{{ product.description }}</div>
+              <div class="read-more" onclick="toggleExpand(this)">Xem thêm</div>
+              {% if product.link %}
+              <img src="{{ product.image }}" alt="{{ product.name }}" />
+              {% endif %}
             </div>
-            <div class="product-box">
-              <strong>AI/Big Data</strong>
-              <p>
-                Optimal services through big data collection and verified AI
-                services.
-              </p>
-            </div>
+            {% endfor %}
           </div>
         </section>
+        {% endif %}
 
-        <section>
+        <section id="jobs">
           <h3>Vị trí tuyển dụng</h3>
-          <div class="job-card">
-            <h4>TeamCenter Engineer (React, BMiDE)</h4>
-            <p>LG CNS Việt Nam - Hà Nội (In Office)</p>
-            <div class="tags">
-              <span>Java</span><span>Docker</span><span>React</span>
-            </div>
-          </div>
-          <div class="job-card">
-            <h4>IBM Maximo Developer</h4>
-            <p>LG CNS Việt Nam - Hà Nội (In Office)</p>
-            <div class="tags">
-              <span>Java</span><span>Python</span><span>SQL Server</span>
-            </div>
-          </div>
+          {% for job in jobs %}
+          <a href="{{ url_for('main.job_detail', job_id=job.id) }}"
+            ><div class="job-card">
+              <h4>{{ job.title }}</h4>
+              <p>{{ job.company }} - {{ job.sort_addresses }}</p>
+              <div class="tags">
+                {% for skill in job.skills %}
+                <span>{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div></a>
+          {% endfor %}
+          {% if jobs | length == 0 %}
+          <p>Hiện tại không có vị trí tuyển dụng nào.</p>
+          {% endif %}
         </section>
       </div>
 
       <aside class="sidebar">
         <div class="box">
           <h4>Thông tin chung</h4>
-          <p><strong>Lĩnh vực:</strong>{{company_info.field}}</p>
-          <p><strong>Quy mô:</strong>{{company_info.company_size}}</p>
+          <p><strong>Lĩnh vực: </strong>{{company_info.industry}}</p>
+          <p><strong>Quy mô: </strong>{{company_info.size}}</p>
           <div class="tags">
-            {% for tag in company_info.skills %} {% if tag != "" %}
-            <span>{{ tag }}</span>
+            <p><strong>Công nghệ:</strong></p>
+            {% for tag in skills %} {% if tag != "" %}
+            <span>{{ tag.name }}</span>
             {% endif %} {% endfor %}
           </div>
+          <p><strong>Quốc gia: </strong>{{company_info.nationality}}</p>
         </div>
 
         <div class="box">
           <h4>Thông tin liên hệ</h4>
           <p>
-            <strong>Website:</strong>
+            <strong>Website</strong>
             <a href="{{company_info.website}}">{{company_info.website}}</a>
           </p>
           <p>
-            <strong>Địa chỉ:</strong><br />
+            <strong>Địa chỉ</strong><br />
             {{company_info.address}}
           </p>
+          {% if social_media and social_media | length > 0 %}
+          <div class="social-icons">
+            <!-- Chỉ icon, không hiển thị link text -->
+            <p><strong>Mạng xã hội</strong></p>
+            {% for social in social_media %} {% set lower_social = social|lower
+            %}
+            <a href="{{ social }}" target="_blank" class="social-icon">
+              {% if 'facebook.com' in lower_social %}
+              <i class="fab fa-facebook-f"></i>
+              {% elif 'linkedin.com' in lower_social %}
+              <i class="fab fa-linkedin-in"></i>
+              {% elif 'youtube.com' in lower_social %}
+              <i class="fab fa-youtube"></i>
+              {% elif 'twitter.com' in lower_social %}
+              <i class="fab fa-twitter"></i>
+              {% elif 'instagram.com' in lower_social %}
+              <i class="fab fa-instagram"></i>
+              {% else %}
+              <i class="fas fa-globe"></i>
+              {% endif %}
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
       </aside>
     </div>
+    <!-- Sau section "Vị trí tuyển dụng" -->
+    {% if suggestions and suggestions|length > 0 %}
+    <section id="similar-companies">
+      <h3>Các công ty tương tự</h3>
+      <div class="company-suggestions">
+        {% for company in suggestions %}
+        <div class="suggestion-card">
+          <div class="suggestion-logo">
+            <img src="{{ company.Logo }}" alt="{{ company.name }}" />
+          </div>
+          <div class="suggestion-info">
+            <h4><a href="/company/{{ company.id }}">{{ company.name }}</a></h4>
+            <p>{{ company.shortdescription }}</p>
+            <p><strong>Ngành:</strong> {{ company.industry }}</p>
+            {%if company_short_address %}
+            <p><strong>Địa chỉ:</strong> {{ company.short_address }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
     <script src="../static/js/dropdownHeader.js"></script>
+    <script>
+      function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+        // Cập nhật tab active
+        document
+          .querySelectorAll(".tabs button")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+      }
+    </script>
+    <script>
+      function toggleExpand(btn) {
+        const box = btn.closest(".product-box");
+        box.classList.toggle("expanded");
+        btn.textContent = box.classList.contains("expanded")
+          ? "Thu gọn"
+          : "Xem thêm";
+      }
+    </script>
   </body>
 </html>

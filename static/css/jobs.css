@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
     background: #f8f9fa;
     margin: 0;
     padding: 0;
@@ -12,27 +12,35 @@ h1 {
 }
 
 .img-logo {
-    width: 100px;
-    height: 100px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
-    margin: 0 auto;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    padding: 4px;
 }
 
 .main-content {
     display: flex;
     margin: 0 auto;
-    padding: 24px;
+    padding: 24px 0;
     align-items: flex-start;
+    max-width: 1280px;
+    box-sizing: border-box;
+    gap: 24px;
 }
 
 .filter-sidebar {
     width: 260px;
+    min-width: 220px;
+    max-width: 300px;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     padding: 20px;
-    margin-right: 24px;
     height: fit-content;
+    margin-right: 0;
 }
 
 .filter-sidebar h3 {
@@ -74,83 +82,126 @@ h1 {
     cursor: pointer;
     margin-top: 10px;
     transition: background 0.2s;
+    width: 100%;
 }
 
 .filter-sidebar button[type="submit"]:hover {
     background: #d32f2f;
 }
 
+.jobs-area {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
 .jobs-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 24px;
-    max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 24px 0 0;
+    box-sizing: border-box;
+}
+
+.job-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
 }
 
 .job-card {
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    padding: 20px;
-    transition: box-shadow 0.2s;
-    border: 1px solid #f5bdbd;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     min-height: 320px;
-
+    height: 320px;
+    max-width: 260px;
+    width: 100%;
+    transition: box-shadow 0.18s, border-color 0.18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    padding: 0;
+    box-sizing: border-box;
+    justify-self: center;
 }
 
 .job-card:hover {
     box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    border-color: #e14c2a;
 }
 
 .job-logo-title {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
-}
-
-.job-logo {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #eee;
+    margin-bottom: 0;
+    padding: 20px 12px 0 12px;
 }
 
 .job-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #b71c1c;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 2px;
+    word-break: break-word;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 5.2em; /* khoảng 4 dòng */
 }
 
 .job-company {
-    color: #333;
+    color: #666;
+    font-size: 0.97rem;
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-info,
+.job-location,
+.job-desc {
+    padding: 0 12px;
 }
 
 .job-info {
     color: #e65100;
     font-size: 0.97rem;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    margin-top: 8px;
 }
 
 .job-location {
     color: #607d8b;
     font-size: 0.95rem;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .job-desc {
     color: #444;
     font-size: 0.95rem;
     margin-bottom: 8px;
+    min-height: 40px;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
 }
 
 .job-skills {
-    margin-top: 8px;
+    margin-top: auto;
+    padding: 0 12px 12px 12px;
 }
 
 .job-skill {
@@ -162,4 +213,45 @@ h1 {
     margin-right: 4px;
     font-size: 0.93rem;
     margin-bottom: 2px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .main-content {
+        flex-direction: column;
+        padding: 12px;
+        gap: 12px;
+    }
+    .filter-sidebar {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 16px;
+    }
+    .jobs-area {
+        padding: 0;
+    }
+    .jobs-grid {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .jobs-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0;
+    }
+    .job-card {
+        max-width: 100%;
+        min-width: 0;
+        height: auto;
+        min-height: 220px;
+    }
+    .main-content {
+        padding: 4px;
+    }
+    .filter-sidebar {
+        padding: 10px;
+    }
 }

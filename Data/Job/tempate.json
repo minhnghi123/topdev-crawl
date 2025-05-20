@@ -1,0 +1,816 @@
+{
+    "type": "database",
+    "name": "crawl",
+    "objects": [
+        {
+            "type": "table",
+            "database": null,
+            "name": "company",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE company (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    Logo TEXT,\n    name TEXT NOT NULL,\n    shortdescription TEXT,\n    curent_job_opening INTEGER,          \n    industry TEXT,\n    size TEXT,\n    nationality TEXT,\n    tech_stack TEXT,\n    website TEXT,\n    Social_media TEXT,\n    address TEXT,\n    description TEXT\n, banner TEXT, short_address TEXT, followers INTEGER, about_images TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "Logo",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "shortdescription",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "curent_job_opening",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "industry",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "size",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "nationality",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "tech_stack",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "website",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "Social_media",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "address",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "description",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "banner",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "short_address",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "followers",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "about_images",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "company_skills",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE company_skills (\r\n\tcompany_id INT ,\r\n\tskill_id INT ,\r\n\tPRIMARY KEY(company_id,skill_id)\r\n\tFOREIGN KEY (company_id) REFERENCES company(id) , \r\n\tFOREIGN KEY (skill_id) REFERENCES  skill(id)\r\n)",
+            "columns": [
+                {
+                    "name": "company_id",
+                    "type": "INT"
+                },
+                {
+                    "name": "skill_id",
+                    "type": "INT"
+                }
+            ],
+            "constraints": [
+                {
+                    "type": "PRIMARY KEY",
+                    "definition": "PRIMARY KEY(company_id,skill_id)\r\n\t"
+                },
+                {
+                    "type": "FOREIGN KEY",
+                    "definition": "FOREIGN KEY (company_id) REFERENCES company(id) "
+                },
+                {
+                    "type": "FOREIGN KEY",
+                    "definition": "FOREIGN KEY (skill_id) REFERENCES  skill(id)\r\n"
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "contractType",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE contractType (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "part time"
+                ],
+                [
+                    2,
+                    "freelance"
+                ],
+                [
+                    3,
+                    "fulltime"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "job",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE job (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, company_name TEXT NOT NULL, id_company INTEGER, full_addresses TEXT, salary TEXT, experience TEXT, skill_id INTEGER, job_type_id INTEGER, level_id INTEGER, contract_type INTEGER REFERENCES contractType (id), logo TEXT, benefits TEXT, content TEXT, sort_addresses TEXT, published_date TEXT, refreshed_date TEXT, responsibilities TEXT, requirements TEXT, benefits_original TEXT, job_url TEXT, FOREIGN KEY (skill_id) REFERENCES skill (id), FOREIGN KEY (job_type_id) REFERENCES jobType (id), FOREIGN KEY (level_id) REFERENCES level (id))",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "title",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "company_name",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "id_company",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "full_addresses",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "salary",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "experience",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "skill_id",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "job_type_id",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "level_id",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "contract_type",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES contractType (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "logo",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "benefits",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "content",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "sort_addresses",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "published_date",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "refreshed_date",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "responsibilities",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "requirements",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "benefits_original",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "job_url",
+                    "type": "TEXT"
+                }
+            ],
+            "constraints": [
+                {
+                    "type": "FOREIGN KEY",
+                    "definition": "FOREIGN KEY (skill_id) REFERENCES skill (id)"
+                },
+                {
+                    "type": "FOREIGN KEY",
+                    "definition": "FOREIGN KEY (job_type_id) REFERENCES jobType (id)"
+                },
+                {
+                    "type": "FOREIGN KEY",
+                    "definition": "FOREIGN KEY (level_id) REFERENCES level (id)"
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "job_company",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE job_company (id_job REFERENCES job (id), id_company INTEGER REFERENCES company (id))",
+            "columns": [
+                {
+                    "name": "id_job",
+                    "type": "",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES job (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "id_company",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES company (id)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "job_jobtypes",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE job_jobtypes (job_id INTEGER REFERENCES job (id), job_type_id INTEGER REFERENCES jobType (id))",
+            "columns": [
+                {
+                    "name": "job_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES job (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "job_type_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES jobType (id)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "job_levels",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE job_levels (job_id INTEGER REFERENCES job (id), level_id REFERENCES level (id))",
+            "columns": [
+                {
+                    "name": "job_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES job (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "level_id",
+                    "type": "",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES level (id)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "job_skills",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE job_skills (job_id INTEGER REFERENCES job (id), skill_id INTEGER REFERENCES skill (id))",
+            "columns": [
+                {
+                    "name": "job_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES job (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "skill_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES skill (id)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "jobType",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE jobType (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "In Office"
+                ],
+                [
+                    2,
+                    "Hybrid"
+                ],
+                [
+                    3,
+                    "Remote"
+                ],
+                [
+                    4,
+                    "Oversea"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "level",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE level (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "Intern"
+                ],
+                [
+                    2,
+                    "Fresher"
+                ],
+                [
+                    3,
+                    "Junior"
+                ],
+                [
+                    4,
+                    "Middle"
+                ],
+                [
+                    5,
+                    "Senior"
+                ],
+                [
+                    6,
+                    "Tru?ng Nhóm"
+                ],
+                [
+                    7,
+                    "Tru?ng phòng"
+                ],
+                [
+                    8,
+                    "All Levels"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "location",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE location (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "H? Chí Minh"
+                ],
+                [
+                    2,
+                    "Hà N?i"
+                ],
+                [
+                    3,
+                    "Ðà N?ng"
+                ],
+                [
+                    4,
+                    "C?n Tho"
+                ],
+                [
+                    5,
+                    "Khác"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "skill",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE skill (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "TEXT"
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "JavaScript"
+                ],
+                [
+                    2,
+                    "Java"
+                ],
+                [
+                    3,
+                    ".NET"
+                ],
+                [
+                    4,
+                    "C#"
+                ],
+                [
+                    5,
+                    "PHP"
+                ],
+                [
+                    6,
+                    "Python"
+                ],
+                [
+                    7,
+                    "C++"
+                ],
+                [
+                    8,
+                    "iOS"
+                ],
+                [
+                    9,
+                    "Android"
+                ],
+                [
+                    10,
+                    "Mobile"
+                ],
+                [
+                    11,
+                    "Flutter"
+                ],
+                [
+                    12,
+                    "React Native"
+                ],
+                [
+                    13,
+                    "Tester"
+                ],
+                [
+                    14,
+                    "Product Manager"
+                ],
+                [
+                    15,
+                    "Business Analyst"
+                ],
+                [
+                    16,
+                    "Project Manager"
+                ],
+                [
+                    17,
+                    "System Admin"
+                ],
+                [
+                    18,
+                    "DevOps"
+                ],
+                [
+                    19,
+                    "System Engineer"
+                ],
+                [
+                    20,
+                    "Data Analyst"
+                ],
+                [
+                    21,
+                    "Game"
+                ],
+                [
+                    22,
+                    "Designer"
+                ],
+                [
+                    23,
+                    "Golang"
+                ],
+                [
+                    24,
+                    "AWS"
+                ],
+                [
+                    25,
+                    "Azure"
+                ],
+                [
+                    26,
+                    "Cloud"
+                ],
+                [
+                    27,
+                    "UI\/UX"
+                ],
+                [
+                    28,
+                    "HTML"
+                ],
+                [
+                    29,
+                    "Unity"
+                ],
+                [
+                    30,
+                    "Kotlin"
+                ],
+                [
+                    31,
+                    "IT Security"
+                ],
+                [
+                    32,
+                    "IT Support"
+                ],
+                [
+                    33,
+                    "IT helpdesk"
+                ],
+                [
+                    34,
+                    "ERP"
+                ],
+                [
+                    35,
+                    "Solution Architect"
+                ],
+                [
+                    36,
+                    "Database"
+                ],
+                [
+                    37,
+                    "Xamarin"
+                ],
+                [
+                    38,
+                    "Front-End"
+                ],
+                [
+                    39,
+                    "Back-End"
+                ],
+                [
+                    40,
+                    "QA QC"
+                ],
+                [
+                    41,
+                    "NodeJS"
+                ],
+                [
+                    42,
+                    "ReactJS"
+                ],
+                [
+                    43,
+                    "VueJS"
+                ],
+                [
+                    44,
+                    "SQL"
+                ],
+                [
+                    45,
+                    "Laravel"
+                ],
+                [
+                    46,
+                    "ASP.NET"
+                ],
+                [
+                    47,
+                    "Angular"
+                ],
+                [
+                    48,
+                    "AngularJS"
+                ],
+                [
+                    49,
+                    "SAP"
+                ],
+                [
+                    50,
+                    "Magento"
+                ],
+                [
+                    51,
+                    "WordPress"
+                ],
+                [
+                    52,
+                    "Network"
+                ],
+                [
+                    53,
+                    "Embedded"
+                ]
+            ]
+        }
+    ]
+}

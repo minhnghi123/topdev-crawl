@@ -4,6 +4,111 @@ from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
 import json
+import re
+from datetime import datetime, timedelta
+
+def parse_salary(salary):
+    salary_min = None
+    salary_max = None
+    salary_currency = None
+
+    if "Thương lượng" in salary:
+        # Trường hợp lương thương lượng
+        salary_min = None
+        salary_max = None
+    elif "Lên tới" in salary or "to" in salary:
+        # Trường hợp lương có "Lên tới" hoặc "to"
+        match = re.findall(r"([\d\.]+)", salary)
+        if len(match) == 1:
+            # Nếu chỉ có một số, đó là salary_max
+            salary_max = int(match[0].replace(".", ""))
+        elif len(match) == 2:
+            # Nếu có hai số, lấy salary_min và salary_max
+            salary_min = int(match[0].replace(".", ""))
+            salary_max = int(match[1].replace(".", ""))
+    else:
+        # Trường hợp khác (không có "Thương lượng" hoặc "Lên tới")
+        match = re.findall(r"([\d\.]+)", salary)
+        if len(match) == 2:
+            salary_min = int(match[0].replace(".", ""))
+            salary_max = int(match[1].replace(".", ""))
+
+    # Xác định đơn vị tiền tệ
+    if "USD" in salary:
+        salary_currency = "USD"
+    elif "VND" in salary:
+        salary_currency = "VND"
+
+    return salary_min, salary_max, salary_currency
+
+def split_job_description(job_description):
+    # Định nghĩa các từ khóa section (không phân biệt hoa thường)
+    keywords = [
+        "trách nhiệm công việc",
+        "kỹ năng & chuyên môn",
+        "phúc lợi dành cho bạn",
+        "quy trình phỏng vấn",
+        "responsibilities",
+        "requirements",
+        "recruitment progress",
+        "benefit"
+    ]
+    # Tạo regex pattern cho từng từ khóa
+    pattern = re.compile(
+        r"^(%s)\s*:?\s*$" % "|".join(re.escape(k) for k in keywords),
+        re.IGNORECASE | re.MULTILINE
+    )
+
+    # Tìm vị trí các section
+    matches = list(pattern.finditer(job_description))
+    sections = {}
+    if not matches:
+        sections["content"] = job_description.strip()
+        return sections
+
+    # Thêm phần đầu nếu có
+    if matches[0].start() > 0:
+        sections["content"] = job_description[:matches[0].start()].strip()
+
+    for i, match in enumerate(matches):
+        section_name = match.group(1).strip().lower()
+        section_start = match.end()
+        section_end = matches[i + 1].start() if i + 1 < len(matches) else len(job_description)
+        section_content = job_description[section_start:section_end].strip()
+        sections[section_name] = section_content
+
+    return sections
+
+def parse_relative_time(text, now=None):
+    if now is None:
+        now = datetime.now()
+    text = str(text).strip()
+    match = re.match(r"(\d+)\s+(giờ|ngày|tuần)\s+(trước|tới)", text)
+    if not match:
+        return text  # Giữ nguyên nếu không đúng định dạng
+    value, unit, direction = match.groups()
+    value = int(value)
+    if unit == "giờ":
+        delta = timedelta(hours=value)
+    elif unit == "ngày":
+        delta = timedelta(days=value)
+    elif unit == "tuần":
+        delta = timedelta(weeks=value)
+    else:
+        return text
+    if direction == "trước":
+        dt = now - delta
+    else:  # "tới"
+        dt = now + delta
+    return dt.isoformat(sep=" ", timespec="seconds")
+
+def convert_salary_to_int(salary):
+    if salary is None:
+        return None
+    if isinstance(salary, str):
+        return salary.replace("*", "0")
+    return salary
+
 # Khởi tạo trình duyệt
 driver = webdriver.Chrome()  # hoặc Firefox
 
@@ -27,8 +132,8 @@ html = driver.page_source
 # Đợi trang tải xong (có thể điều chỉnh thời gian nếu cần)
 
 # Đường dẫn file chứa danh sách link
-job_links_file = r"D:\git\topdev-crawl\Data\Job\job_links_full.json"
-output_file = r"D:\git\topdev-crawl\Data\Job\job_info.json"
+job_links_file = r"Data/job/job_links_full.json"
+output_file = r"Data/job/job_links_full_2.json"
 
 # Đọc danh sách link từ file JSON
 with open(job_links_file, "r", encoding="utf-8") as f:
@@ -36,13 +141,16 @@ with open(job_links_file, "r", encoding="utf-8") as f:
 
 company_data = []
 # Crawl từng link
+now = datetime.now()
 for link in job_links:
-    
+    if not link.startswith("https://topdev.vn/viec-lam/"):
+        print(f"Link không hợp lệ: {link}")
+        continue
     try:
         # Mở trang web
         url = link
         driver.get(url)
-
+        time.sleep(2)
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
 
@@ -51,7 +159,9 @@ for link in job_links:
 
         # Tiêu đề công việc
         job_title = job_section.find('h1', class_='text-2xl font-bold text-black').text.strip() if job_section.find('h1', class_='text-2xl font-bold text-black') else None
+        logo_img = job_section.find("img") if job_section else None
 
+        img = logo_img["src"] if logo_img and "src" in logo_img.attrs else None
         # Tên công ty
         company_name = job_section.find('p', class_='my-1 line-clamp-1 text-base font-bold text-[#F05C43]').text.strip() if job_section.find('p', class_='my-1 line-clamp-1 text-base font-bold text-[#F05C43]') else None
 
@@ -69,10 +179,13 @@ for link in job_links:
         main_info = soup.find('div', class_='flex flex-col self-stretch p-[25px] pb-2')
         if main_info:
             # Lương
-            salary = None
+            salary_min = None
+            salary_max = None
+            salary_currency = None
             salary_tag = main_info.find('p', class_='text-primary')
             if salary_tag:
                 salary = salary_tag.text.strip()
+                salary_min, salary_max, salary_currency = parse_salary(salary)
 
             # Thời gian đăng và hết hạn
             posted_time = None
@@ -126,36 +239,48 @@ for link in job_links:
                 if contract_parent:
                     contract_type = contract_parent.text.strip()
 
-           
-
-
- 
-       
-        job_description = None
         job_desc_div = soup.find('div', id='JobDescription')
+        job_description_sections = {
+            "content": None,
+            "RESPONSIBILITIES": None,
+            "Requirements": None,
+            "Recruitment Progress": None,
+            "BENEFIT": None
+        }
         if job_desc_div:
-            # Lấy toàn bộ HTML mô tả (nếu muốn lấy text thì dùng .get_text(separator="\n", strip=True))
-            job_description = job_desc_div.decode_contents().strip()
+            job_desc_text = job_desc_div.get_text(separator="\n", strip=True)
+            sections = split_job_description(job_desc_text)
+            print(sections)
+            job_description_sections["content"] = job_desc_text
+            job_description_sections["RESPONSIBILITIES"] = sections.get("responsibilities", "") + " " + sections.get("trách nhiệm công việc", "")
+            job_description_sections["Requirements"] = sections.get("requirements", "") + " " +  sections.get("kỹ năng & chuyên môn", "")
+            job_description_sections["Recruitment Progress"] = sections.get("recruitment progress", "") + " " +  sections.get("quy trình phỏng vấn", "")
+            job_description_sections["BENEFIT"] = sections.get("benefit", "") + " " +  sections.get("phúc lợi dành cho bạn", "")
 
-
-        # Thêm vào danh sách dữ liệu
+        # Thêm vào danh sách dữ liệu (áp dụng chuyển đổi)
         company_data.append({
             "url": url,
             "job_title": job_title,
+            "logo": img,
             "company_name": company_name,
             "address": address,
+            "skills": skills,   
             "address_long": address_long,
-            "salary": salary,
-            "posted_time": posted_time,
-            "expired_time": expired_time,
-            "skills": skills,
+            "salary_min": convert_salary_to_int(salary_min),
+            "salary_max": convert_salary_to_int(salary_max),
+            "salary_currency": salary_currency,
+            "posted_time": parse_relative_time(posted_time, now) if posted_time else None,
             "exp": exp,
             "level": level,
             "job_type": job_type,
             "contract_type": contract_type,
-            "job_description": job_description
+            "expired_time": parse_relative_time(expired_time, now) if expired_time else None,
+            "content": job_description_sections.get("content", ""),
+            "RESPONSIBILITIES": sections.get("responsibilities", "") + " " + sections.get("trách nhiệm công việc", ""),
+            "Requirements": sections.get("requirements", "") + " " + sections.get("kỹ năng & chuyên môn", ""),
+            "Recruitment Progress": sections.get("recruitment progress", "") + " " + sections.get("quy trình phỏng vấn", ""),
+            "BENEFIT": sections.get("benefit", "") + " " + sections.get("phúc lợi dành cho bạn", ""),
         })
-
         print(f"Đã crawl: {link}")
     except Exception as e:
         print(f"Lỗi khi crawl {link}: {e}")
