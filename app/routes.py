@@ -79,19 +79,25 @@ def company():
     page = int(request.args.get("page", 1))
 
     keyword = request.args.get("keyword", "").strip().lower()
+    content_keyword = request.args.get("content_keyword", "").strip().lower()
     city = request.args.get("city", "").strip()
     district = request.args.get("district", "").strip()
 
     query = Company.query
 
     company_ids = None
+    # --- Keyword filter: ilike + vectordb ---
     if keyword:
-        # Sử dụng search_companies để lấy danh sách id phù hợp nhất
-        company_ids = search.search_companies(keyword, top_k=200)
-        if company_ids:
-            query = query.filter(Company.id.in_(company_ids))
+        # Lọc bằng ilike tên công ty
+        query = query.filter(Company.name.ilike(f"%{keyword}%"))
+  
+    # --- Content keyword filter: vectordb mô tả ---
+    if content_keyword:
+        vectordb_ids = search.search_companies(content_keyword, top_k=200)
+        if vectordb_ids:
+            query = query.filter(Company.id.in_(vectordb_ids))
         else:
-            query = query.filter(False)  # Không có kết quả
+            query = query.filter(False)
 
     if district:
         query = query.filter(Company.short_address.ilike(f"%{district}%"))
@@ -126,11 +132,11 @@ def company():
         page=page,
         total_pages=total_pages,
         keyword=keyword,
+        content_keyword=content_keyword,
         city=city,
         district=district,
         city_map=city_map,
     )
-
 
 @main.route("/company/<int:company_id>")
 def company_details(company_id):
@@ -232,6 +238,7 @@ def jobs():
 
     # Lấy tham số lọc từ request
     keyword = request.args.get('keyword', '').lower()
+    content_keyword = request.args.get('content_keyword', '').lower()
     location = request.args.get('location', '')
     level = request.args.get('level', '')
     skill = request.args.get('skill', '')
@@ -241,13 +248,18 @@ def jobs():
     query = Job.query
 
     job_ids = None
+    # --- Keyword filter: ilike + vectordb ---
     if keyword:
-        # Sử dụng search_jobs để lấy danh sách id phù hợp nhất
-        job_ids = search.search_jobs(keyword, top_k=200)
-        if job_ids:
-            query = query.filter(Job.id.in_(job_ids))
+        # Lọc bằng ilike tiêu đề job
+        query = query.filter(Job.title.ilike(f"%{keyword}%"))
+
+    # --- Content keyword filter: vectordb mô tả ---
+    if content_keyword:
+        vectordb_ids = search.search_jobs(content_keyword, top_k=200)
+        if vectordb_ids:
+            query = query.filter(Job.id.in_(vectordb_ids))
         else:
-            query = query.filter(False)  # Không có kết quả
+            query = query.filter(False)
 
     if location:
         query = query.filter(Job.sort_addresses.ilike(f"%{location}%"))
@@ -258,9 +270,33 @@ def jobs():
     if job_type:
         query = query.filter(Job.job_type.ilike(f"%{job_type}%"))
 
-    total_jobs = query.count()
-    total_pages = math.ceil(total_jobs / per_page)
-    jobs = query.offset((page - 1) * per_page).limit(per_page).all()
+    # --- Sắp xếp ---
+    if sort == "date_desc":
+        query = query.order_by(Job.refreshed_date.desc())
+        total_jobs = query.count()
+        total_pages = math.ceil(total_jobs / per_page)
+        jobs = query.offset((page - 1) * per_page).limit(per_page).all()
+    elif sort == "salary_desc":
+        jobs_all = query.all()
+        usd_to_vnd = 25000
+        def get_salary_max_vnd(job):
+            max_salary = job.salary_max
+            try:
+                max_salary = float(max_salary) if max_salary is not None and max_salary != '' else None
+            except Exception:
+                max_salary = None
+            currency = (job.salary_currency or '').strip().upper()
+            if max_salary is not None and currency == "USD":
+                max_salary = max_salary * usd_to_vnd
+            return max_salary if max_salary is not None else 0
+        jobs_all_sorted = sorted(jobs_all, key=get_salary_max_vnd, reverse=True)
+        total_jobs = len(jobs_all_sorted)
+        total_pages = math.ceil(total_jobs / per_page)
+        jobs = jobs_all_sorted[(page - 1) * per_page : page * per_page]
+    else:
+        total_jobs = query.count()
+        total_pages = math.ceil(total_jobs / per_page)
+        jobs = query.offset((page - 1) * per_page).limit(per_page).all()
 
     # Chuyển đổi sang dict nếu cần thiết cho template
     jobs_list = []
@@ -292,7 +328,9 @@ def jobs():
         "jobs.html",
         jobs=jobs_list,
         page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        keyword=keyword,
+        content_keyword=content_keyword
     )
 
 @main.route("/job/<int:job_id>")
@@ -350,20 +388,16 @@ def job_detail(job_id):
 
     for other in all_jobs:
         score = 0
-        # Chuẩn hóa skills
         other_skills = set()
         if isinstance(other.skills, str):
             other_skills = set([s.strip().lower() for s in other.skills.split(',') if s.strip()])
         elif isinstance(other.skills, list):
             other_skills = set([s.strip().lower() for s in other.skills if s.strip()])
-        # 1. Shared skills
         shared_skills = current_skills & other_skills
         score += len(shared_skills)
-        # 2. City match
         other_city = extract_city(other.sort_addresses)
         if current_city and other_city and current_city == other_city:
             score += 2
-        # 3. Experience match (năm kinh nghiệm)
         other_exp = (other.experience or '').strip().lower()
         if current_exp and other_exp and current_exp == other_exp:
             score += 1

@@ -14,8 +14,12 @@
             <h3>Bộ lọc</h3>
             <form method="get" action="">
                 <!-- Từ khóa -->
-                <label for="keyword">Từ khóa:</label>
-                <input type="text" id="keyword" name="keyword" placeholder="Nhập từ khóa..." style="width:100%;margin-bottom:14px;">
+                <label for="keyword">Từ khóa (tiêu đề):</label>
+                <input type="text" id="keyword" name="keyword" placeholder="Nhập từ khóa..." value="{{ keyword or '' }}" style="width:100%;margin-bottom:14px;">
+
+                <!-- Tìm kiếm nội dung -->
+                <label for="content_keyword">Tìm kiếm nội dung:</label>
+                <input type="text" id="content_keyword" name="content_keyword" placeholder="Nhập nội dung mô tả..." value="{{ content_keyword or '' }}" style="width:100%;margin-bottom:14px;">
 
                 <!-- Địa điểm -->
                 <label for="location">Địa điểm:</label>
@@ -143,3 +147,4 @@
 </body>
     <script src="../static/js/dropdownHeader.js"></script>
 </html>
+``` 
